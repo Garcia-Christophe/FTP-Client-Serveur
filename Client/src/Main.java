@@ -19,7 +19,7 @@ import java.util.Scanner;
 public class Main {
   static public String pathClient;
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     System.out.println("Le client FTP");
 
     // Liste des commandes possibles
@@ -31,6 +31,7 @@ public class Main {
     commandes.add("get");
     commandes.add("ls");
     commandes.add("stor");
+    commandes.add("bye");
 
     // Initialisation du chemin client
     if (pathClient == null) {
@@ -41,144 +42,165 @@ public class Main {
     }
 
     // Connexion au serveur
-    Socket socket = new Socket("localhost", 2121);
+    Socket socket = null;
+    PrintWriter pw = null;
+    Scanner scan = null;
+    BufferedReader br = null;
+    try {
+      socket = new Socket("localhost", 2121);
 
-    String envoi = "";
-    PrintWriter pw = new PrintWriter(socket.getOutputStream());
-    Scanner scan = new Scanner(System.in);
-    BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    boolean commandeValide = true;
-    String destination = pathClient;
+      String envoi = "";
+      pw = new PrintWriter(socket.getOutputStream());
+      scan = new Scanner(System.in);
+      br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      boolean commandeValide = true;
+      String destination = pathClient;
 
-    // Boucle d'envoi des commandes
-    while (!envoi.equals("bye")) {
-      // Réponse du serveur
-      String recu = "";
-      boolean arreter = false;
-      while (!arreter && commandeValide) {
-        recu = br.readLine();
-        System.out.println(recu);
+      // Boucle d'envoi des commandes
+      while (!envoi.equals("bye")) {
+        // Réponse du serveur
+        String recu = "";
+        boolean arreter = false;
+        while (!arreter && commandeValide) {
+          recu = br.readLine();
+          System.out.println(recu);
 
-        String[] val = recu.split("\\s+");
-        if (!val[0].equals("1")) {
-          arreter = true;
-        }
-
-        // Si le client doit télécharger un fichier (GET)
-        String[] e = envoi.split("\\s+");
-        if (e[0].equals("get") && !arreter) {
-          Socket socketGet = new Socket("localhost", 5000);
-          InputStream inputGet = socketGet.getInputStream();
-          ByteArrayOutputStream byteArrayGet = new ByteArrayOutputStream();
-
-          if (inputGet != null) {
-            String[] s = e[1].split("/");
-            FileOutputStream fos = new FileOutputStream(pathClient + s[s.length - 1]);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-            byte[] aByte = new byte[1];
-
-            while (inputGet.read(aByte, 0, aByte.length) != -1) {
-              byteArrayGet.write(aByte);
-            }
-            bos.write(byteArrayGet.toByteArray());
-            bos.flush();
-            bos.close();
-            socketGet.close();
+          String[] val = recu.split("\\s+");
+          if (!val[0].equals("1")) {
+            arreter = true;
           }
-          // Si la commande demandé est un stor
-        } else if (e[0].equals("stor") && !arreter) {
-          try {
-            Socket socketStor = new Socket("localhost", 4000);
-            File file = new File(destination);
-            BufferedOutputStream bos = new BufferedOutputStream(socketStor.getOutputStream());
-            if (bos != null) {
-              byte[] tabByte = new byte[(int) file.length()];
-              FileInputStream fis = new FileInputStream(file);
-              BufferedInputStream bis = new BufferedInputStream(fis);
-              bis.read(tabByte, 0, tabByte.length);
-              bos.write(tabByte, 0, tabByte.length);
+
+          // Si le client doit télécharger un fichier (GET)
+          String[] e = envoi.split("\\s+");
+          if (e[0].equals("get") && !arreter) {
+            Socket socketGet = new Socket("localhost", 5000);
+            InputStream inputGet = socketGet.getInputStream();
+            ByteArrayOutputStream byteArrayGet = new ByteArrayOutputStream();
+
+            if (inputGet != null) {
+              String[] s = e[1].split("/");
+              FileOutputStream fos = new FileOutputStream(pathClient + s[s.length - 1]);
+              BufferedOutputStream bos = new BufferedOutputStream(fos);
+              byte[] aByte = new byte[1];
+
+              while (inputGet.read(aByte, 0, aByte.length) != -1) {
+                byteArrayGet.write(aByte);
+              }
+              bos.write(byteArrayGet.toByteArray());
               bos.flush();
-              bis.close();
-              fis.close();
               bos.close();
-              socketStor.close();
+              socketGet.close();
             }
+            // Si la commande demandé est un stor
+          } else if (e[0].equals("stor") && !arreter) {
+            try {
+              Socket socketStor = new Socket("localhost", 4000);
+              File file = new File(destination);
+              BufferedOutputStream bos = new BufferedOutputStream(socketStor.getOutputStream());
+              if (bos != null) {
+                byte[] tabByte = new byte[(int) file.length()];
+                FileInputStream fis = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                bis.read(tabByte, 0, tabByte.length);
+                bos.write(tabByte, 0, tabByte.length);
+                bos.flush();
+                bis.close();
+                fis.close();
+                bos.close();
+                socketStor.close();
+              }
 
-          } catch (IOException er) {
-            er.printStackTrace();
+            } catch (IOException er) {
+              er.printStackTrace();
+            }
           }
         }
-      }
 
+        // Récupération de la commande
+        System.out.println("\nEntrez votre commande :");
+        envoi = scan.nextLine();
 
-      // Récupération de la commande
-      envoi = scan.nextLine();
-
-      boolean existe = false;
-      int i = 0;
-      while (!existe && i < commandes.size()) {
-        if (commandes.get(i).equals(envoi.split("\\s+")[0])) {
-          existe = true;
-        }
-        i++;
-      }
-
-      // vérification du fichier en cas de commande stor
-      if (envoi.split("\\s+")[0].equals("stor")) {
-        String base = envoi.split("\\s+")[1];
-        if (base.charAt(0) != '/') {
-          base = "/" + base;
+        boolean existe = false;
+        int i = 0;
+        while (!existe && i < commandes.size()) {
+          if (commandes.get(i).equals(envoi.split("\\s+")[0])) {
+            existe = true;
+          }
+          i++;
         }
 
-        // Conversion des chemins relatifs
-        destination = pathClient;
-        if (base.equals("/")) {
+        // vérification du fichier en cas de commande stor
+        if (envoi.split("\\s+")[0].equals("stor")) {
+          String base = envoi.split("\\s+")[1];
+          if (base.charAt(0) != '/') {
+            base = "/" + base;
+          }
+
+          // Conversion des chemins relatifs
           destination = pathClient;
-        } else {
-          String[] dossiers = base.split("/");
-          for (String s : dossiers) {
-            if (s.length() != 0) {
-              if (s.equals("..")) {
-                if (!destination.equals(pathClient)) {
-                  String[] tabPathTmp = destination.split("/");
-                  destination = "";
-                  for (int j = 0; j < tabPathTmp.length - 1; j++) {
-                    destination += tabPathTmp[j] + "/";
+          if (base.equals("/")) {
+            destination = pathClient;
+          } else {
+            String[] dossiers = base.split("/");
+            for (String s : dossiers) {
+              if (s.length() != 0) {
+                if (s.equals("..")) {
+                  if (!destination.equals(pathClient)) {
+                    String[] tabPathTmp = destination.split("/");
+                    destination = "";
+                    for (int j = 0; j < tabPathTmp.length - 1; j++) {
+                      destination += tabPathTmp[j] + "/";
+                    }
                   }
+                } else if (s.equals("~")) {
+                  destination = pathClient;
+                } else if (!s.equals(".")) {
+                  destination = destination + s + "/";
                 }
-              } else if (s.equals("~")) {
-                destination = pathClient;
-              } else if (!s.equals(".")) {
-                destination = destination + s + "/";
               }
             }
           }
+
+          // Création de l'objet File
+          File file = new File(destination);
+
+          // Si le fichier existe
+          if (!Files.exists(Paths.get(destination)) || !file.isFile()) {
+            existe = false;
+          }
         }
 
-        // Création de l'objet File
-        File file = new File(destination);
-
-        // Si le fichier existe
-        if (!Files.exists(Paths.get(destination)) || !file.isFile()) {
-          existe = false;
+        if (existe) {
+          pw.println(envoi);
+          pw.flush();
+          commandeValide = true;
+        } else {
+          commandeValide = false;
+          System.out
+              .println("Commande " + envoi.split("\\s+")[0] + " inexistante ou paramètre invalide");
         }
       }
 
-      if (existe) {
-        pw.println(envoi);
-        pw.flush();
-        commandeValide = true;
-      } else {
-        commandeValide = false;
-        System.out
-            .println("Commande " + envoi.split("\\s+")[0] + " inexistante ou paramètre invalide");
+      System.out.println("Au revoir !");
+
+      // Fermeture des flux et de la socket
+      br.close();
+      scan.close();
+      pw.close();
+      socket.close();
+    } catch (IOException e1) {
+      // Fermeture subite du serveur
+      System.out.println("Le serveur a ferme. Vous allez etre deconnecte. Au revoir !");
+
+      // Fermeture des flux et de la socket
+      try {
+        br.close();
+        scan.close();
+        pw.close();
+        socket.close();
+      } catch (IOException e) {
+        e.printStackTrace();
       }
     }
-
-    // Fermeture des flux et de la socket
-    br.close();
-    scan.close();
-    pw.close();
-    socket.close();
   }
 }
