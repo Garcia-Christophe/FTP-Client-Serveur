@@ -33,14 +33,6 @@ public class Main {
     commandes.add("stor");
     commandes.add("bye");
 
-    // Initialisation du chemin client
-    if (pathClient == null) {
-      File file = new File(".");
-      pathClient = file.getAbsoluteFile().toString();
-      pathClient = pathClient.substring(0, pathClient.length() - 1);
-      pathClient += "/espaceClient/";
-    }
-
     // Connexion au serveur
     Socket socket = null;
     PrintWriter pw = null;
@@ -50,6 +42,7 @@ public class Main {
       socket = new Socket("localhost", 2121);
 
       String envoi = "";
+      String name = "";
       pw = new PrintWriter(socket.getOutputStream());
       scan = new Scanner(System.in);
       br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -113,6 +106,15 @@ public class Main {
             } catch (IOException er) {
               er.printStackTrace();
             }
+          } else if (e[0].equals("user") && val[0].equals("0")) {
+            // Initialisation du chemin client
+            File file = new File(".");
+            pathClient = file.getAbsoluteFile().toString();
+            pathClient = pathClient.substring(0, pathClient.length() - 1);
+            pathClient += "/" + name + "/";
+            commandes.remove("user");
+          } else if (e[0].equals("pass") && val[0].equals("0")) {
+            commandes.remove("pass");
           }
         }
 
@@ -168,6 +170,8 @@ public class Main {
           if (!Files.exists(Paths.get(destination)) || !file.isFile()) {
             existe = false;
           }
+        } else if (envoi.split("\\s+")[0].equals("user")) {
+          name = envoi.split("\\s+")[1];
         }
 
         if (existe) {
