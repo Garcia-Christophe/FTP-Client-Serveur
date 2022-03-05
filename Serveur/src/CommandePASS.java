@@ -31,7 +31,7 @@ public class CommandePASS extends Commande {
 
     // Vérification du mot de passe
     if (commandeArgs[0].equals(mdp)) {
-      CommandExecutor.pwOk = true;
+      main.pwOk = true;
       ps.println("1 Commande pass OK");
       ps.println("0 Vous etes bien connecte sur notre serveur");
     } else {

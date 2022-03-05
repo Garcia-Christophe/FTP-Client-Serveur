@@ -2,11 +2,8 @@ import java.io.PrintStream;
 
 public class CommandExecutor {
 
-  public static boolean userOk = false;
-  public static boolean pwOk = false;
-
   public static void executeCommande(PrintStream ps, String commande, Main main) {
-    if (userOk && pwOk) {
+    if (main.userOk && main.pwOk) {
       // Changer de repertoire. Un (..) permet de revenir au repertoire superieur
       if (commande.split(" ")[0].equals("cd"))
         (new CommandeCD(ps, commande, main)).execute();

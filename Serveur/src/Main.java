@@ -19,6 +19,10 @@ public class Main extends Thread {
 
   private String userPath;
 
+  public boolean userOk;
+
+  public boolean pwOk;
+
   public static void main(String[] args) {
     System.out.println("Le Serveur FTP");
     ServerSocket serveurFTP = null;
@@ -97,8 +101,8 @@ public class Main extends Thread {
 
       // Fermeture de la socket et réinitialisation des paramètres de connexion
       socket.close();
-      CommandExecutor.userOk = false;
-      CommandExecutor.pwOk = false;
+      this.userOk = false;
+      this.pwOk = false;
     } catch (IOException e) {
       // Départ subit du client
       System.out.println("Le client " + (name != null ? name + " " : "") + "s'est deconnecte !");
@@ -106,8 +110,8 @@ public class Main extends Thread {
       // Fermeture de la socket et réinitialisation des paramètres de connexion
       try {
         socket.close();
-        CommandExecutor.userOk = false;
-        CommandExecutor.pwOk = false;
+        this.userOk = false;
+        this.pwOk = false;
       } catch (IOException e1) {
         e1.printStackTrace();
       }

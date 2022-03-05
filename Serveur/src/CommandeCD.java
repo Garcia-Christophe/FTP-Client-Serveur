@@ -53,7 +53,7 @@ public class CommandeCD extends Commande {
         ps.println("2 Le chemin " + destination + " n'est pas celui d'un dossier");
       } else {
         this.main.setUserPath(pathTmp);
-        ps.println("0 Le nouveau chemin est " + this.main.getClientName());
+        ps.println("0 Le nouveau chemin est " + this.main.getUserPath());
       }
     }
   }
