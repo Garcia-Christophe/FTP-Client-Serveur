@@ -11,8 +11,6 @@ import java.net.Socket;
 
 public class Main extends Thread {
 
-  private ServerSocket serveurFTP;
-
   private Socket socket;
 
   private String name;
@@ -41,7 +39,7 @@ public class Main extends Thread {
       try {
         socket = serveurFTP.accept();
 
-        Main m = new Main(serveurFTP, socket);
+        Main m = new Main(socket);
         m.start();
       } catch (IOException e) {
         e.printStackTrace();
@@ -56,8 +54,7 @@ public class Main extends Thread {
     }
   }
 
-  public Main(ServerSocket ss, Socket s) {
-    this.serveurFTP = ss;
+  public Main(Socket s) {
     this.socket = s;
   }
 
