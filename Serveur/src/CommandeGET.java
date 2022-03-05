@@ -11,8 +11,11 @@ import java.nio.file.Paths;
 
 public class CommandeGET extends Commande {
 
-  public CommandeGET(PrintStream ps, String commandeStr) {
+  private Main main;
+
+  public CommandeGET(PrintStream ps, String commandeStr, Main m) {
     super(ps, commandeStr);
+    this.main = m;
   }
 
   public void execute() {
@@ -22,15 +25,15 @@ public class CommandeGET extends Commande {
     }
 
     // Conversion des chemins relatifs
-    String destination = userPath;
+    String destination = this.main.getUserPath();
     if (base.equals("/")) {
-      destination = name + "/";
+      destination = this.main.getClientName() + "/";
     } else {
       String[] dossiers = base.split("/");
       for (String s : dossiers) {
         if (s.length() != 0) {
           if (s.equals("..")) {
-            if (!destination.equals(name + "/")) {
+            if (!destination.equals(this.main.getClientName() + "/")) {
               String[] tabPathTmp = destination.split("/");
               destination = "";
               for (int i = 0; i < tabPathTmp.length - 1; i++) {
@@ -38,7 +41,7 @@ public class CommandeGET extends Commande {
               }
             }
           } else if (s.equals("~")) {
-            destination = name + "/";
+            destination = this.main.getClientName() + "/";
           } else if (!s.equals(".")) {
             destination = destination + s + "/";
           }

@@ -6,8 +6,11 @@ import java.nio.file.Paths;
 
 public class CommandeCD extends Commande {
 
-  public CommandeCD(PrintStream ps, String commandeStr) {
+  private Main main;
+
+  public CommandeCD(PrintStream ps, String commandeStr, Main m) {
     super(ps, commandeStr);
+    this.main = m;
   }
 
   public void execute() {
@@ -17,16 +20,16 @@ public class CommandeCD extends Commande {
     }
 
     // Conversion des chemins relatifs
-    String pathTmp = userPath;
+    String pathTmp = this.main.getUserPath();
     if (destination.equals("/")) {
-      userPath = name + "/";
-      ps.println("0 Le nouveau chemin est " + userPath);
+      this.main.setUserPath(this.main.getClientName() + "/");
+      ps.println("0 Le nouveau chemin est " + this.main.getUserPath());
     } else {
       String[] dossiers = destination.split("/");
       for (String s : dossiers) {
         if (s.length() != 0) {
           if (s.equals("..")) {
-            if (!pathTmp.equals(name + "/")) {
+            if (!pathTmp.equals(this.main.getClientName() + "/")) {
               String[] tabPathTmp = pathTmp.split("/");
               pathTmp = "";
               for (int i = 0; i < tabPathTmp.length - 1; i++) {
@@ -34,7 +37,7 @@ public class CommandeCD extends Commande {
               }
             }
           } else if (s.equals("~")) {
-            pathTmp = name + "/";
+            pathTmp = this.main.getClientName() + "/";
           } else if (!s.equals(".")) {
             pathTmp = pathTmp + s + "/";
           }
@@ -49,8 +52,8 @@ public class CommandeCD extends Commande {
       } else if (!fileDestination.isDirectory()) {
         ps.println("2 Le chemin " + destination + " n'est pas celui d'un dossier");
       } else {
-        userPath = pathTmp;
-        ps.println("0 Le nouveau chemin est " + userPath);
+        this.main.setUserPath(pathTmp);
+        ps.println("0 Le nouveau chemin est " + this.main.getClientName());
       }
     }
   }

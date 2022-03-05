@@ -5,12 +5,15 @@ import java.nio.file.Paths;
 
 public class CommandeLS extends Commande {
 
-  public CommandeLS(PrintStream ps, String commandeStr) {
+  private Main main;
+
+  public CommandeLS(PrintStream ps, String commandeStr, Main m) {
     super(ps, commandeStr);
+    this.main = m;
   }
 
   public void execute() {
-    String userPathLS = userPath;
+    String userPathLS = this.main.getUserPath();
     if (commandeArgs.length != 0) {
       String base = commandeArgs[0];
       if (base.charAt(0) != '/') {
@@ -18,13 +21,13 @@ public class CommandeLS extends Commande {
       }
 
       if (base.equals("/")) {
-        userPathLS = name + "/";
+        userPathLS = this.main.getClientName() + "/";
       } else {
         String[] dossiers = base.split("/");
         for (String s : dossiers) {
           if (s.length() != 0) {
             if (s.equals("..")) {
-              if (!userPathLS.equals(name + "/")) {
+              if (!userPathLS.equals(this.main.getClientName() + "/")) {
                 String[] tabPathTmp = userPathLS.split("/");
                 userPathLS = "";
                 for (int i = 0; i < tabPathTmp.length - 1; i++) {
@@ -32,7 +35,7 @@ public class CommandeLS extends Commande {
                 }
               }
             } else if (s.equals("~")) {
-              userPathLS = name + "/";
+              userPathLS = this.main.getClientName() + "/";
             } else if (!s.equals(".")) {
               userPathLS = userPathLS + s + "/";
             }

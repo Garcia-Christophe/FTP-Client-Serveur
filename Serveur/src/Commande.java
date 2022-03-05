@@ -7,8 +7,6 @@ public abstract class Commande {
   protected String commandeNom = "";
   protected String[] commandeArgs;
   public static String path;
-  public static String userPath;
-  public static String name;
 
   public Commande(PrintStream ps, String commandeStr) {
     this.ps = ps;

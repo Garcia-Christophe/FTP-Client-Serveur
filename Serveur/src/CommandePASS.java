@@ -1,4 +1,3 @@
-import java.awt.image.BufferedImageFilter;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -7,15 +6,18 @@ import java.io.PrintStream;
 
 public class CommandePASS extends Commande {
 
-  public CommandePASS(PrintStream ps, String commandeStr) {
+  private Main main;
+
+  public CommandePASS(PrintStream ps, String commandeStr, Main m) {
     super(ps, commandeStr);
+    this.main = m;
   }
 
   public void execute() {
     // Récupération du mot de passe
     String mdp = "";
     try {
-      FileReader fr = new FileReader(path + "/" + name + "/pw.txt");
+      FileReader fr = new FileReader(path + "/" + this.main.getClientName() + "/pw.txt");
       BufferedReader br = new BufferedReader(fr);
 
       mdp = br.readLine();

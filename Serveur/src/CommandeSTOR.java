@@ -9,8 +9,11 @@ import java.net.Socket;
 
 public class CommandeSTOR extends Commande {
 
-  public CommandeSTOR(PrintStream ps, String commandeStr) {
+  private Main main;
+
+  public CommandeSTOR(PrintStream ps, String commandeStr, Main m) {
     super(ps, commandeStr);
+    this.main = m;
   }
 
   public void execute() {
@@ -24,7 +27,8 @@ public class CommandeSTOR extends Commande {
 
       if (inputGet != null) {
         String[] s = commandeArgs[0].split("/");
-        FileOutputStream fos = new FileOutputStream(path + userPath + s[s.length - 1]);
+        FileOutputStream fos =
+            new FileOutputStream(path + this.main.getUserPath() + s[s.length - 1]);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         byte[] aByte = new byte[1];
 
