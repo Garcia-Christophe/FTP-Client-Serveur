@@ -77,10 +77,10 @@ public class CommandeGET extends Commande {
             bis.close();
             fis.close();
             bos.close();
-            socket.close();
-            serveurFTP.close();
           }
 
+          socket.close();
+          serveurFTP.close();
         } catch (IOException e) {
           e.printStackTrace();
         }

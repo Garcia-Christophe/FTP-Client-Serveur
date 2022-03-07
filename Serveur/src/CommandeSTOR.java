@@ -40,8 +40,8 @@ public class CommandeSTOR extends Commande {
           bos.flush();
           ps.println("0 Fin du téléchargement du fichier");
           bos.close();
-          socket.close();
         }
+        socket.close();
         serveurFTP.close();
       } catch (IOException e) {
         e.printStackTrace();
