@@ -23,6 +23,7 @@ public class Main {
 
   public static void main(String[] args) {
     System.out.println("Le client FTP");
+    String host = "192.168.0.210";
 
     // Liste des commandes possibles
     ArrayList<String> commandes = new ArrayList<String>();
@@ -44,7 +45,7 @@ public class Main {
     Scanner scan = null;
     BufferedReader br = null;
     try {
-      socket = new Socket("localhost", 2121);
+      socket = new Socket(host, 2121);
 
       String envoi = "";
       String name = "";
@@ -71,7 +72,7 @@ public class Main {
           // Si le client doit télécharger un fichier (GET)
           String[] e = envoi.split("\\s+");
           if (e[0].equals("get") && !arreter) {
-            Socket socketGet = new Socket("localhost", 5000);
+            Socket socketGet = new Socket(host, 5000);
             InputStream inputGet = socketGet.getInputStream();
             ByteArrayOutputStream byteArrayGet = new ByteArrayOutputStream();
 
@@ -92,7 +93,7 @@ public class Main {
             // Si la commande demandé est un stor
           } else if (e[0].equals("stor") && !arreter) {
             try {
-              Socket socketStor = new Socket("localhost", 4000);
+              Socket socketStor = new Socket(host, 4000);
               File file = new File(destination);
               BufferedOutputStream bos = new BufferedOutputStream(socketStor.getOutputStream());
               if (bos != null) {
@@ -207,6 +208,7 @@ public class Main {
     } catch (IOException e1) {
       // Fermeture subite du serveur
       System.out.println("Le serveur a ferme. Vous allez etre deconnecte. Au revoir !");
+      e1.printStackTrace();
 
       // Fermeture des flux et de la socket
       try {
