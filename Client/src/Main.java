@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Main {
@@ -32,6 +34,9 @@ public class Main {
     commandes.add("ls");
     commandes.add("stor");
     commandes.add("bye");
+
+    Pattern pattern = Pattern.compile("(.*[:*?\"<>|].*)");
+    Matcher matcher = null;
 
     // Connexion au serveur
     Socket socket = null;
@@ -122,18 +127,26 @@ public class Main {
         System.out.println("\nEntrez votre commande :");
         envoi = scan.nextLine();
 
+        String[] tab = envoi.split("\\s+");
         boolean existe = false;
         int i = 0;
         while (!existe && i < commandes.size()) {
-          if (commandes.get(i).equals(envoi.split("\\s+")[0])) {
+          if (commandes.get(i).equals(tab[0])) {
             existe = true;
           }
           i++;
         }
 
+        if (tab.length > 1) {
+          matcher = pattern.matcher(tab[1]);
+          if (matcher.find()) {
+            existe = false;
+          }
+        }
+
         // vérification du fichier en cas de commande stor
-        if (envoi.split("\\s+")[0].equals("stor")) {
-          String base = envoi.split("\\s+")[1];
+        if (tab[0].equals("stor") && tab.length > 1) {
+          String base = tab[1];
           if (base.charAt(0) != '/') {
             base = "/" + base;
           }
@@ -170,8 +183,8 @@ public class Main {
           if (!Files.exists(Paths.get(destination)) || !file.isFile()) {
             existe = false;
           }
-        } else if (envoi.split("\\s+")[0].equals("user")) {
-          name = envoi.split("\\s+")[1];
+        } else if (tab[0].equals("user") && tab.length > 1) {
+          name = tab[1];
         }
 
         if (existe) {
@@ -180,8 +193,7 @@ public class Main {
           commandeValide = true;
         } else {
           commandeValide = false;
-          System.out
-              .println("Commande " + envoi.split("\\s+")[0] + " inexistante ou paramètre invalide");
+          System.out.println("Commande " + tab[0] + " inexistante ou paramètre invalide");
         }
       }
 

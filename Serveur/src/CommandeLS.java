@@ -14,7 +14,7 @@ public class CommandeLS extends Commande {
 
   public void execute() {
     String userPathLS = this.main.getUserPath();
-    if (commandeArgs.length != 0) {
+    if (commandeArgs != null && commandeArgs.length != 0) {
       String base = commandeArgs[0];
       if (base.charAt(0) != '/') {
         base = "/" + base;
