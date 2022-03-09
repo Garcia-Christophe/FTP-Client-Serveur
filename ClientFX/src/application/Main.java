@@ -11,7 +11,7 @@ public class Main extends Application {
   @Override
   public void start(Stage primaryStage) {
     try {
-      Parent root = FXMLLoader.load(getClass().getResource("connexion.fxml"));
+      Parent root = FXMLLoader.load(getClass().getResource("navigation.fxml"));
       primaryStage.setTitle("MyFTP");
       primaryStage.setScene(new Scene(root));
       primaryStage.show();
