@@ -12,7 +12,7 @@ public class Main extends Application {
   public void start(Stage primaryStage) {
     try {
       Parent root = FXMLLoader.load(getClass().getResource("connexion.fxml"));
-      primaryStage.setTitle("Mon Application");
+      primaryStage.setTitle("MyFTP");
       primaryStage.setScene(new Scene(root));
       primaryStage.show();
     } catch (Exception e) {
