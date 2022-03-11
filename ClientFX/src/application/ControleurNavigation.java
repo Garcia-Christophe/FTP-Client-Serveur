@@ -2,6 +2,7 @@ package application;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -35,16 +36,87 @@ public class ControleurNavigation implements Initializable {
     }
 
     // Affichage fichiers/dossiers côté serveur
-    // LS
+    ArrayList<String> filesServeur = Main.utilisateur.commandeLS(null);
+    for (String s : filesServeur) {
+      listServeur.getItems().add(new Label(s));
+    }
   }
 
   @FXML
   public void entrerCommande() {
-    Label label = new Label("> " + inputCommande.getText());
+    String path = Main.utilisateur.getPathClient();
+    path = path.substring(0, path.length() - 1);
+    Label label = new Label(path + "# " + inputCommande.getText());
     label.setTextFill(Color.web("#FFFFFF"));
     listTerminal.getItems().add(label);
     listTerminal.getStylesheets().add("/application/terminal.css");
     scrollPaneTerminal.setVvalue(1);
+    String[] tabCommande = inputCommande.getText().split("\\s+");
+
+    // Commande CD
+    if (tabCommande[0].equals("cd")) {
+      // Récupération du dossier dans lequel il faut se déplacer
+      String dossier = "";
+      for (int i = 1; i < tabCommande.length; i++) {
+        dossier += tabCommande[i] + " ";
+      }
+
+      String oldClientPath = Main.utilisateur.getPathClient();
+      String cd = Main.utilisateur.commandeCD(dossier);
+      listTerminal.getItems().add(new Label("   " + cd));
+
+      // Afficher le nouveau contenu du dossier courant
+      if (!Main.utilisateur.getPathClient().equals(oldClientPath)) {
+        ArrayList<String> filesServeur = Main.utilisateur.commandeLS(".");
+        listServeur.getItems().clear();
+        for (String s : filesServeur) {
+          listServeur.getItems().add(new Label(s));
+        }
+      }
+    }
+
+    // Commande GET
+    else if (tabCommande[0].equals("get")) {
+      System.out.println("get");
+    }
+
+    // Commande LS
+    else if (tabCommande[0].equals("ls")) {
+      // Récupération du potentiel dossier dont il faut afficher le contenu
+      String dossier = "";
+      for (int i = 1; i < tabCommande.length; i++) {
+        dossier += tabCommande[i] + " ";
+      }
+
+      // Execution de la commande
+      ArrayList<String> files = Main.utilisateur.commandeLS(dossier);
+
+      // Afichage dans le terminal
+      if (files.get(0).equals("*")) {
+        listTerminal.getItems().add(new Label("   " + files.get(1)));
+      } else {
+        for (String s : files) {
+          listTerminal.getItems().add(new Label("   " + s));
+        }
+      }
+    }
+
+    // Commande PWD
+    else if (tabCommande[0].equals("pwd")) {
+      String pwd = Main.utilisateur.commandePWD();
+      listTerminal.getItems().add(new Label("   " + pwd));
+    }
+
+    // Commande STOR
+    else if (tabCommande[0].equals("stor")) {
+      System.out.println("stor");
+    }
+
+    // Commandes inexistante
+    else {
+      System.out.println("autre");
+    }
+
     inputCommande.setText("");
   }
 }

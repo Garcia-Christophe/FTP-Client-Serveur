@@ -56,9 +56,9 @@ public class CommandeLS extends Commande {
       } else {
         for (int i = 0; i < files.length; i++) {
           if (i != files.length - 1) {
-            ps.println("1 " + files[i].getName());
+            ps.println("1 " + (files[i].isFile() ? files[i].getName() : files[i].getName() + "/"));
           } else {
-            ps.println("0 " + files[i].getName());
+            ps.println("0 " + (files[i].isFile() ? files[i].getName() : files[i].getName() + "/"));
           }
         }
       }
