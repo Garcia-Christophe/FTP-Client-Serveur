@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane minHeight="400.0" minWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ControleurNavigation">
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ControleurNavigation">
    <children>
       <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -17,12 +17,12 @@
                <children>
                   <VBox VBox.vgrow="ALWAYS">
                      <children>
-                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" style="-fx-background-color: #C1C1C1;">
+                        <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="30.0" style="-fx-background-color: #C1C1C1;">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
                            <children>
-                              <Label text="Vos dossiers">
+                              <Label text="Vos dossiers" HBox.hgrow="ALWAYS">
                                  <padding>
                                     <Insets left="10.0" />
                                  </padding>
@@ -31,19 +31,22 @@
                         </HBox>
                         <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
                            <content>
-                              <AnchorPane style="-fx-background-color: #DCF8F6;" />
+                              <AnchorPane>
+                                 <children>
+                                    <ListView fx:id="listClient" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children></AnchorPane>
                            </content>
                         </ScrollPane>
                      </children>
                   </VBox>
                   <VBox VBox.vgrow="ALWAYS">
                      <children>
-                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" style="-fx-background-color: #C1C1C1;">
+                        <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="30.0" style="-fx-background-color: #C1C1C1;">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
                            <children>
-                              <Label text="Vos dossiers sur le serveur">
+                              <Label text="Vos dossiers sur le serveur" HBox.hgrow="ALWAYS">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
@@ -55,7 +58,10 @@
                         </HBox>
                         <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
                           <content>
-                            <AnchorPane style="-fx-background-color: #DCF8F6;" />
+                            <AnchorPane>
+                                 <children>
+                                    <ListView fx:id="listServeur" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children></AnchorPane>
                           </content>
                         </ScrollPane>
                      </children>
@@ -68,7 +74,7 @@
                     <content>
                       <AnchorPane>
                            <children>
-                              <ListView fx:id="listTerminal" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <ListView fx:id="listTerminal" style="-fx-background-color: #000;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children></AnchorPane>
                     </content>
                   </ScrollPane>

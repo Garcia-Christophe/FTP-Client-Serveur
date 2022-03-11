@@ -46,7 +46,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField fx:id="inputHost">
+                  <TextField fx:id="inputHost" onAction="#connexion">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
@@ -63,7 +63,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField fx:id="inputUser">
+                  <TextField fx:id="inputUser" onAction="#connexion">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
@@ -80,7 +80,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField fx:id="inputPass">
+                  <TextField fx:id="inputPass" onAction="#connexion">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>

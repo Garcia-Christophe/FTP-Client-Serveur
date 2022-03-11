@@ -88,7 +88,7 @@ public class Utilisateur {
 
       // Si la commande user est bonne
       if (tabRecu != null && tabRecu[0].equals("0")) {
-        this.commandes.remove("pass");
+        this.commandes.remove("user");
 
         // Commande pass
         recu = "1 ";

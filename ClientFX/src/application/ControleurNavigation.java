@@ -1,5 +1,6 @@
 package application;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -16,10 +17,24 @@ public class ControleurNavigation implements Initializable {
   @FXML
   private ScrollPane scrollPaneTerminal;
   @FXML
+  private ListView<Label> listClient;
+  @FXML
+  private ListView<Label> listServeur;
+  @FXML
   private ListView<Label> listTerminal;
 
   @Override
-  public void initialize(URL location, ResourceBundle resources) {}
+  public void initialize(URL location, ResourceBundle resources) {
+    // Affichage fichiers/dossiers côté client
+    File file = new File(Main.utilisateur.getName());
+    File[] files = file.listFiles();
+    for (File f : files) {
+      listClient.getItems().add(new Label(f.isFile() ? f.getName() : f.getName() + "/"));
+    }
+
+    // Affichage fichiers/dossiers côté serveur
+    // LS
+  }
 
   @FXML
   public void entrerCommande() {
