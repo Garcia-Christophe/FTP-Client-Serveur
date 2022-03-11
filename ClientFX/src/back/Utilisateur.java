@@ -24,8 +24,6 @@ public class Utilisateur {
 
   private String host;
 
-  private ArrayList<String> commandes;
-
   private Socket socket;
 
   private PrintWriter pw;
@@ -36,18 +34,7 @@ public class Utilisateur {
 
   private String name;
 
-  public Utilisateur() {
-    // Liste des commandes possibles
-    this.commandes = new ArrayList<String>();
-    this.commandes.add("user");
-    this.commandes.add("pass");
-    this.commandes.add("pwd");
-    this.commandes.add("cd");
-    this.commandes.add("get");
-    this.commandes.add("ls");
-    this.commandes.add("stor");
-    this.commandes.add("bye");
-  }
+  public Utilisateur() {}
 
   /**
    * Tente de se connecter à l'application serveur.
@@ -61,6 +48,7 @@ public class Utilisateur {
     String connexion = null;
     this.host = host;
     this.name = user;
+    this.pathClient = user + "/";
 
     try {
       // Connexion avec le serveur
@@ -88,8 +76,6 @@ public class Utilisateur {
 
       // Si la commande user est bonne
       if (tabRecu != null && tabRecu[0].equals("0")) {
-        this.commandes.remove("user");
-
         // Commande pass
         recu = "1 ";
         tabRecu = null;
@@ -101,10 +87,7 @@ public class Utilisateur {
         tabRecu = recu.split("\\s+");
 
         // Si la commande pass est bonne
-        if (tabRecu != null && tabRecu[0].equals("0")) {
-          // connexion OK
-          this.commandes.remove("pass");
-        } else {
+        if (tabRecu == null || !tabRecu[0].equals("0")) {
           // Erreur pass
           connexion = "Erreur pass : ";
           for (int i = 1; i < tabRecu.length; i++) {
@@ -141,6 +124,108 @@ public class Utilisateur {
     }
 
     return connexion;
+  }
+
+  /**
+   * Tente d'exécuter la commande CD sur le serveur.
+   * 
+   * @param dossier la dossier dans lequel se déplacer
+   * @return La réponse du serveur
+   */
+  public String commandeCD(String dossier) {
+    String reponse = "";
+
+    try {
+      // Commande cd
+      reponse = "1 ";
+      pw.println("cd " + dossier);
+      pw.flush();
+
+      while (reponse.split("\\s+")[0].equals("1")) {
+        reponse = br.readLine();
+      }
+
+      // Mise à jour du path du client
+      if (reponse.charAt(0) == '0') {
+        this.setPathClient(this.commandePWD());
+      }
+
+      reponse = reponse.substring(2);
+    } catch (IOException e) {
+      reponse = "Impossible de se déplacer";
+      e.printStackTrace();
+    }
+
+    return reponse;
+  }
+
+  /**
+   * Tente d'exécuter la commande LS sur le serveur.
+   * 
+   * @param dossier le nom du dossier dont il faut afficher le contenu (null si dossier courant
+   * @return La liste des fichiers/dossiers sur le serveur, ou "*" s'il y a une erreur
+   */
+  public ArrayList<String> commandeLS(String dossier) {
+    ArrayList<String> files = new ArrayList<String>();
+    files.add("*"); // cas d'erreur (aucun fichier ne peut s'appeler ainsi)
+
+    try {
+      // Commande ls
+      String recu = "1 ";
+      ArrayList<String> tabRecu = new ArrayList<String>();
+      pw.println("ls " + (dossier != null && !dossier.isEmpty() ? dossier : ""));
+      pw.flush();
+
+      while (recu.split("\\s+")[0].equals("1")) {
+        recu = br.readLine();
+        tabRecu.add(recu);
+      }
+
+      // Si la commande ls est bonne, on ajoute le nom des fichiers/dossiers
+      if (recu.split("\\s+")[0].equals("0")) {
+        files.clear();
+      }
+      String[] tabLigne = null;
+      String ligne = "";
+      for (String s : tabRecu) {
+        tabLigne = s.split("\\s+");
+        ligne = "";
+        for (int i = 1; i < tabLigne.length; i++) {
+          ligne += tabLigne[i] + " ";
+        }
+        files.add(ligne);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return files;
+  }
+
+  /**
+   * Tente d'exécuter la commande PWD sur le serveur.
+   * 
+   * @return La réponse du serveur
+   */
+  public String commandePWD() {
+    String pwd = "";
+
+    try {
+      // Commande pwd
+      pwd = "1 ";
+      pw.println("pwd");
+      pw.flush();
+
+      while (pwd.split("\\s+")[0].equals("1")) {
+        pwd = br.readLine();
+      }
+      pwd = pwd.substring(2);
+    } catch (IOException e) {
+      pwd = "Impossible d'afficher le dossier courant";
+      e.printStackTrace();
+    }
+
+    return pwd;
   }
 
   public void communication() {
