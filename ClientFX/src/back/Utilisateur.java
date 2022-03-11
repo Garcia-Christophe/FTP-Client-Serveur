@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -35,10 +36,7 @@ public class Utilisateur {
 
   private String name;
 
-  public Utilisateur(String host) {
-    // Host de l'application serveur
-    this.host = host;
-
+  public Utilisateur() {
     // Liste des commandes possibles
     this.commandes = new ArrayList<String>();
     this.commandes.add("user");
@@ -52,12 +50,17 @@ public class Utilisateur {
   }
 
   /**
-   * Tente de se connecter à l'application serveur
+   * Tente de se connecter à l'application serveur.
    * 
-   * @return 1 si la connexion a réussi, 0 si la connexion a échoué
+   * @param host nom de l'host
+   * @param user nom de l'utilisateur
+   * @param pass mot de passe de l'utilisateur
+   * @return null si la connexion a réussi, le message d'erreur du serveur sinon
    */
-  public int connexion() {
-    int connexion = 1;
+  public String connexion(String host, String user, String pass) {
+    String connexion = null;
+    this.host = host;
+    this.name = user;
 
     try {
       // Connexion avec le serveur
@@ -66,8 +69,75 @@ public class Utilisateur {
       // Création des flux
       this.pw = new PrintWriter(socket.getOutputStream());
       this.br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+      // Récupération des messages de bienvenue
+      String recu = "1 ";
+      while (recu.split("\\s+")[0].equals("1")) {
+        recu = br.readLine();
+      }
+
+      // Commande user
+      recu = "1 ";
+      String[] tabRecu = null;
+      pw.println("user " + user);
+      pw.flush();
+      while (recu.split("\\s+")[0].equals("1")) {
+        recu = br.readLine();
+      }
+      tabRecu = recu.split("\\s+");
+
+      // Si la commande user est bonne
+      if (tabRecu != null && tabRecu[0].equals("0")) {
+        this.commandes.remove("pass");
+
+        // Commande pass
+        recu = "1 ";
+        tabRecu = null;
+        pw.println("pass " + pass);
+        pw.flush();
+        while (recu.split("\\s+")[0].equals("1")) {
+          recu = br.readLine();
+        }
+        tabRecu = recu.split("\\s+");
+
+        // Si la commande pass est bonne
+        if (tabRecu != null && tabRecu[0].equals("0")) {
+          // connexion OK
+          this.commandes.remove("pass");
+        } else {
+          // Erreur pass
+          connexion = "Erreur pass : ";
+          for (int i = 1; i < tabRecu.length; i++) {
+            connexion += tabRecu[i] + " ";
+          }
+        }
+      } else {
+        // Erreur user
+        connexion = "Erreur user : ";
+        for (int i = 1; i < tabRecu.length; i++) {
+          connexion += tabRecu[i] + " ";
+        }
+      }
     } catch (IOException e) {
-      connexion = 0;
+      // Erreur host
+      connexion = "Erreur host : impossible de se connecter à l'application serveur";
+    }
+
+    // Fermeture des flux en cas d'erreur
+    if (connexion != null) {
+      try {
+        if (this.br != null) {
+          this.br.close();
+        }
+        if (this.pw != null) {
+          this.pw.close();
+        }
+        if (this.socket != null) {
+          this.socket.close();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
 
     return connexion;
