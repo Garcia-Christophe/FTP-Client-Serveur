@@ -10,7 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.TextField;;
 
 
 public class ControleurConnexion implements Initializable {
@@ -33,11 +33,31 @@ public class ControleurConnexion implements Initializable {
    * serveur.
    */
   public void connexion() {
+    boolean vides = false;
     // Vérification de la saisie des champs
-    if (inputHost.getText().isEmpty() || inputUser.getText().isEmpty()
-        || inputPass.getText().isEmpty()) {
+    if (inputHost.getText().isEmpty()) {
       labelErreur.setText("Erreur : Veuillez remplir tous les champs");
+      inputHost.getStyleClass().add("errorTextField");
+      vides = true;
     } else {
+      inputHost.getStyleClass().remove("errorTextField");
+    }
+    if (inputUser.getText().isEmpty()) {
+      labelErreur.setText("Erreur : Veuillez remplir tous les champs");
+      inputUser.getStyleClass().add("errorTextField");
+      vides = true;
+    } else {
+      inputUser.getStyleClass().remove("errorTextField");
+    }
+    if (inputPass.getText().isEmpty()) {
+      labelErreur.setText("Erreur : Veuillez remplir tous les champs");
+      inputPass.getStyleClass().add("errorTextField");
+      vides = true;
+    } else {
+      inputPass.getStyleClass().remove("errorTextField");
+    }
+
+    if (!vides) {
       String connexion =
           Main.utilisateur.connexion(inputHost.getText(), inputUser.getText(), inputPass.getText());
       if (connexion == null) {
@@ -53,6 +73,24 @@ public class ControleurConnexion implements Initializable {
         }
       } else {
         labelErreur.setText(connexion);
+        if (connexion.split("\\s+")[1].equals("host")) {
+          inputHost.getStyleClass().add("errorTextField");
+        } else {
+          inputHost.getStyleClass().remove("errorTextField");
+        }
+
+        if (connexion.split("\\s+")[1].equals("user")) {
+          inputUser.getStyleClass().add("errorTextField");
+        } else {
+          inputUser.getStyleClass().remove("errorTextField");
+        }
+
+        if (connexion.split("\\s+")[1].equals("pass")) {
+          inputPass.getStyleClass().add("errorTextField");
+        } else {
+          inputPass.getStyleClass().remove("errorTextField");
+        }
+
       }
     }
   }

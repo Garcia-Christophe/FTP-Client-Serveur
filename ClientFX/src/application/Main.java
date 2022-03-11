@@ -19,7 +19,9 @@ public class Main extends Application {
       Parent root = FXMLLoader.load(getClass().getResource("connexion.fxml"));
       stage = primaryStage;
       stage.setTitle("MyFTP");
-      stage.setScene(new Scene(root));
+      Scene s = new Scene(root);
+      s.getStylesheets().add("/application/erreur.css");
+      stage.setScene(s);
       stage.setMinHeight(600);
       stage.setMinWidth(800);
       stage.show();

@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 
 
 public class ControleurNavigation implements Initializable {
@@ -30,6 +31,7 @@ public class ControleurNavigation implements Initializable {
     File[] files = file.listFiles();
     for (File f : files) {
       listClient.getItems().add(new Label(f.isFile() ? f.getName() : f.getName() + "/"));
+      listClient.getStylesheets().add("/application/dossiers.css");
     }
 
     // Affichage fichiers/dossiers côté serveur
@@ -39,7 +41,9 @@ public class ControleurNavigation implements Initializable {
   @FXML
   public void entrerCommande() {
     Label label = new Label("> " + inputCommande.getText());
+    label.setTextFill(Color.web("#FFFFFF"));
     listTerminal.getItems().add(label);
+    listTerminal.getStylesheets().add("/application/terminal.css");
     scrollPaneTerminal.setVvalue(1);
     inputCommande.setText("");
   }
