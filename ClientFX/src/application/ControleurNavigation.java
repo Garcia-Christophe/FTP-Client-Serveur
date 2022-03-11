@@ -32,14 +32,18 @@ public class ControleurNavigation implements Initializable {
     File[] files = file.listFiles();
     for (File f : files) {
       listClient.getItems().add(new Label(f.isFile() ? f.getName() : f.getName() + "/"));
-      listClient.getStylesheets().add("/application/dossiers.css");
     }
+    listClient.getStylesheets().add("/application/dossiers.css");
 
     // Affichage fichiers/dossiers côté serveur
     ArrayList<String> filesServeur = Main.utilisateur.commandeLS(null);
     for (String s : filesServeur) {
       listServeur.getItems().add(new Label(s));
     }
+    listServeur.getStylesheets().add("/application/dossiers.css");
+
+    // Init terminal
+    listTerminal.getStylesheets().add("/application/terminal.css");
   }
 
   @FXML
@@ -49,7 +53,6 @@ public class ControleurNavigation implements Initializable {
     Label label = new Label(path + "# " + inputCommande.getText());
     label.setTextFill(Color.web("#FFFFFF"));
     listTerminal.getItems().add(label);
-    listTerminal.getStylesheets().add("/application/terminal.css");
     scrollPaneTerminal.setVvalue(1);
     String[] tabCommande = inputCommande.getText().split("\\s+");
 
@@ -63,7 +66,9 @@ public class ControleurNavigation implements Initializable {
 
       String oldClientPath = Main.utilisateur.getPathClient();
       String cd = Main.utilisateur.commandeCD(dossier);
-      listTerminal.getItems().add(new Label("   " + cd));
+      Label labelCD = new Label("   " + cd);
+      labelCD.setTextFill(Color.web("#FFFFFF"));
+      listTerminal.getItems().add(labelCD);
 
       // Afficher le nouveau contenu du dossier courant
       if (!Main.utilisateur.getPathClient().equals(oldClientPath)) {
@@ -93,10 +98,14 @@ public class ControleurNavigation implements Initializable {
 
       // Afichage dans le terminal
       if (files.get(0).equals("*")) {
-        listTerminal.getItems().add(new Label("   " + files.get(1)));
+        Label labelLS = new Label("   " + files.get(1));
+        labelLS.setTextFill(Color.web("#FFFFFF"));
+        listTerminal.getItems().add(labelLS);
       } else {
         for (String s : files) {
-          listTerminal.getItems().add(new Label("   " + s));
+          Label labelLS = new Label("   " + s);
+          labelLS.setTextFill(Color.web("#FFFFFF"));
+          listTerminal.getItems().add(labelLS);
         }
       }
     }
@@ -104,7 +113,9 @@ public class ControleurNavigation implements Initializable {
     // Commande PWD
     else if (tabCommande[0].equals("pwd")) {
       String pwd = Main.utilisateur.commandePWD();
-      listTerminal.getItems().add(new Label("   " + pwd));
+      Label labelPWD = new Label("   " + pwd);
+      labelPWD.setTextFill(Color.web("#FFFFFF"));
+      listTerminal.getItems().add(labelPWD);
     }
 
     // Commande STOR
