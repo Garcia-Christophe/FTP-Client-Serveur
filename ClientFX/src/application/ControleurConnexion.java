@@ -2,6 +2,7 @@ package application;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import back.Utilisateur;
 import javafx.fxml.FXML;
@@ -58,9 +59,26 @@ public class ControleurConnexion implements Initializable {
     }
 
     if (!vides) {
-      String connexion =
-          Main.utilisateur.connexion(inputHost.getText(), inputUser.getText(), inputPass.getText());
-      if (connexion == null) {
+      int erreurConnexion = 1;
+      ArrayList<String> reponses = Main.utilisateur.connexion(inputHost.getText());
+
+      // Si host OK
+      if (reponses.get(reponses.size() - 1).charAt(0) == '0') {
+        erreurConnexion = 2;
+        reponses = Main.utilisateur.commande("user", inputUser.getText());
+        // Si user OK
+        if (reponses.get(reponses.size() - 1).charAt(0) == '0') {
+          erreurConnexion = 3;
+          reponses = Main.utilisateur.commande("pass", inputPass.getText());
+
+          // Si pass OK
+          if (reponses.get(reponses.size() - 1).charAt(0) == '0') {
+            erreurConnexion = 0;
+          }
+        }
+      }
+
+      if (erreurConnexion == 0) {
         labelErreur.setText("");
         try {
           Parent root = FXMLLoader.load(getClass().getResource("navigation.fxml"));
@@ -72,20 +90,20 @@ public class ControleurConnexion implements Initializable {
           e.printStackTrace();
         }
       } else {
-        labelErreur.setText(connexion);
-        if (connexion.split("\\s+")[1].equals("host")) {
+        labelErreur.setText(reponses.get(reponses.size() - 1).substring(2));
+        if (erreurConnexion == 1) {
           inputHost.getStyleClass().add("errorTextField");
         } else {
           inputHost.getStyleClass().remove("errorTextField");
         }
 
-        if (connexion.split("\\s+")[1].equals("user")) {
+        if (erreurConnexion == 2) {
           inputUser.getStyleClass().add("errorTextField");
         } else {
           inputUser.getStyleClass().remove("errorTextField");
         }
 
-        if (connexion.split("\\s+")[1].equals("pass")) {
+        if (erreurConnexion == 3) {
           inputPass.getStyleClass().add("errorTextField");
         } else {
           inputPass.getStyleClass().remove("errorTextField");

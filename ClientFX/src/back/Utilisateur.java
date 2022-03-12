@@ -40,15 +40,11 @@ public class Utilisateur {
    * Tente de se connecter à l'application serveur.
    * 
    * @param host nom de l'host
-   * @param user nom de l'utilisateur
-   * @param pass mot de passe de l'utilisateur
-   * @return null si la connexion a réussi, le message d'erreur du serveur sinon
+   * @return les réponses du serveur
    */
-  public String connexion(String host, String user, String pass) {
-    String connexion = null;
+  public ArrayList<String> connexion(String host) {
+    ArrayList<String> reponses = new ArrayList<String>();
     this.host = host;
-    this.name = user;
-    this.pathClient = user + "/";
 
     try {
       // Connexion avec le serveur
@@ -62,170 +58,64 @@ public class Utilisateur {
       String recu = "1 ";
       while (recu.split("\\s+")[0].equals("1")) {
         recu = br.readLine();
-      }
-
-      // Commande user
-      recu = "1 ";
-      String[] tabRecu = null;
-      pw.println("user " + user);
-      pw.flush();
-      while (recu.split("\\s+")[0].equals("1")) {
-        recu = br.readLine();
-      }
-      tabRecu = recu.split("\\s+");
-
-      // Si la commande user est bonne
-      if (tabRecu != null && tabRecu[0].equals("0")) {
-        // Commande pass
-        recu = "1 ";
-        tabRecu = null;
-        pw.println("pass " + pass);
-        pw.flush();
-        while (recu.split("\\s+")[0].equals("1")) {
-          recu = br.readLine();
-        }
-        tabRecu = recu.split("\\s+");
-
-        // Si la commande pass est bonne
-        if (tabRecu == null || !tabRecu[0].equals("0")) {
-          // Erreur pass
-          connexion = "Erreur pass : ";
-          for (int i = 1; i < tabRecu.length; i++) {
-            connexion += tabRecu[i] + " ";
-          }
-        }
-      } else {
-        // Erreur user
-        connexion = "Erreur user : ";
-        for (int i = 1; i < tabRecu.length; i++) {
-          connexion += tabRecu[i] + " ";
-        }
+        reponses.add(recu);
       }
     } catch (IOException e) {
       // Erreur host
-      connexion = "Erreur host : impossible de se connecter à l'application serveur";
+      reponses.add("2 Impossible de se connecter à l'application serveur");
+      this.deconnexion();
     }
 
-    // Fermeture des flux en cas d'erreur
-    if (connexion != null) {
-      try {
-        if (this.br != null) {
-          this.br.close();
-        }
-        if (this.pw != null) {
-          this.pw.close();
-        }
-        if (this.socket != null) {
-          this.socket.close();
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-
-    return connexion;
+    return reponses;
   }
 
   /**
-   * Tente d'exécuter la commande CD sur le serveur.
+   * Tente d'exécuter la commande sur le serveur.
    * 
-   * @param dossier la dossier dans lequel se déplacer
-   * @return La réponse du serveur
+   * @param cmd la commande é exécuter
+   * @param param le potetiel paramètre de la commande
+   * @return les réponses du serveur
    */
-  public String commandeCD(String dossier) {
-    String reponse = "";
+  public ArrayList<String> commande(String cmd, String param) {
+    ArrayList<String> reponses = new ArrayList<String>();
 
     try {
-      // Commande cd
-      reponse = "1 ";
-      pw.println("cd " + dossier);
-      pw.flush();
 
-      while (reponse.split("\\s+")[0].equals("1")) {
-        reponse = br.readLine();
-      }
+      if (cmd.equals("bye")) {
+        pw.println(cmd);
+        pw.flush();
 
-      // Mise à jour du path du client
-      if (reponse.charAt(0) == '0') {
-        this.setPathClient(this.commandePWD());
-      }
+        this.deconnexion();
+        reponses.add("0 Vous avez été déconnecté");
+      } else {
+        // Envoi de la commande
+        String reponse = "1 ";
+        pw.println(cmd + (param != null ? " " + param : ""));
+        pw.flush();
 
-      reponse = reponse.substring(2);
-    } catch (IOException e) {
-      reponse = "Impossible de se déplacer";
-      e.printStackTrace();
-    }
-
-    return reponse;
-  }
-
-  /**
-   * Tente d'exécuter la commande LS sur le serveur.
-   * 
-   * @param dossier le nom du dossier dont il faut afficher le contenu (null si dossier courant
-   * @return La liste des fichiers/dossiers sur le serveur, ou "*" s'il y a une erreur
-   */
-  public ArrayList<String> commandeLS(String dossier) {
-    ArrayList<String> files = new ArrayList<String>();
-    files.add("*"); // cas d'erreur (aucun fichier ne peut s'appeler ainsi)
-
-    try {
-      // Commande ls
-      String recu = "1 ";
-      ArrayList<String> tabRecu = new ArrayList<String>();
-      pw.println("ls " + (dossier != null && !dossier.isEmpty() ? dossier : ""));
-      pw.flush();
-
-      while (recu.split("\\s+")[0].equals("1")) {
-        recu = br.readLine();
-        tabRecu.add(recu);
-      }
-
-      // Si la commande ls est bonne, on ajoute le nom des fichiers/dossiers
-      if (recu.split("\\s+")[0].equals("0")) {
-        files.clear();
-      }
-      String[] tabLigne = null;
-      String ligne = "";
-      for (String s : tabRecu) {
-        tabLigne = s.split("\\s+");
-        ligne = "";
-        for (int i = 1; i < tabLigne.length; i++) {
-          ligne += tabLigne[i] + " ";
+        while (reponse.split("\\s+")[0].equals("1")) {
+          reponse = br.readLine();
+          reponses.add(reponse);
         }
-        files.add(ligne);
+
+        if (reponse.charAt(0) == '0') {
+          // Si CD : mise à jour du path du client
+          if (cmd.equals("cd")) {
+            this.setPathClient(this.commande("pwd", "").get(0).substring(2));
+          }
+          // Si USER : initialisation du nom/pathClient
+          else if (cmd.equals("user")) {
+            this.name = param;
+            this.pathClient = param + "/";
+          }
+        }
       }
     } catch (IOException e) {
+      reponses.add("2 Impossible d'exécuter la commande");
       e.printStackTrace();
     }
 
-    return files;
-  }
-
-  /**
-   * Tente d'exécuter la commande PWD sur le serveur.
-   * 
-   * @return La réponse du serveur
-   */
-  public String commandePWD() {
-    String pwd = "";
-
-    try {
-      // Commande pwd
-      pwd = "1 ";
-      pw.println("pwd");
-      pw.flush();
-
-      while (pwd.split("\\s+")[0].equals("1")) {
-        pwd = br.readLine();
-      }
-      pwd = pwd.substring(2);
-    } catch (IOException e) {
-      pwd = "Impossible d'afficher le dossier courant";
-      e.printStackTrace();
-    }
-
-    return pwd;
+    return reponses;
   }
 
   public void communication() {
@@ -297,16 +187,6 @@ public class Utilisateur {
           } catch (IOException er) {
             er.printStackTrace();
           }
-          // Si le client souhaite se connecter (USER)
-        } else if (e[0].equals("user") && val[0].equals("0")) {
-          // Initialisation du chemin client
-          File file = new File(".");
-          pathClient = file.getAbsoluteFile().toString();
-          pathClient = pathClient.substring(0, pathClient.length() - 1);
-          pathClient += "/" + name + "/";
-          commandes.remove("user");
-        } else if (e[0].equals("pass") && val[0].equals("0")) {
-          commandes.remove("pass");
         }
       }
 
@@ -317,12 +197,6 @@ public class Utilisateur {
       String[] tab = envoi.split("\\s+");
       boolean existe = false;
       int i = 0;
-      while (!existe && i < commandes.size()) {
-        if (commandes.get(i).equals(tab[0])) {
-          existe = true;
-        }
-        i++;
-      }
 
       if (tab.length > 1) {
         matcher = pattern.matcher(tab[1]);
@@ -393,12 +267,24 @@ public class Utilisateur {
    */
   public void deconnexion() {
     try {
-      br.close();
-      pw.close();
-      socket.close();
+      if (br != null) {
+        br.close();
+      }
+      if (pw != null) {
+        pw.close();
+      }
+      if (socket != null) {
+        socket.close();
+      }
+      this.name = "<Non identifié>";
+      this.pathClient = "<utilisez 'user/pass'> ";
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public String getHost() {
+    return host;
   }
 
   public String getPathClient() {

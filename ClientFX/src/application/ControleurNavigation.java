@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -14,6 +16,9 @@ import javafx.scene.paint.Color;
 
 
 public class ControleurNavigation implements Initializable {
+
+  private ArrayList<String> commandes;
+
   @FXML
   private TextField inputCommande;
   @FXML
@@ -27,6 +32,16 @@ public class ControleurNavigation implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    // Initialisation des commandes possibles
+    commandes = new ArrayList<String>();
+    commandes.add("bye");
+    commandes.add("cd");
+    commandes.add("get");
+    commandes.add("ls");
+    commandes.add("pwd");
+    commandes.add("stor");
+    commandes.add("clear");
+
     // Affichage fichiers/dossiers côté client
     File file = new File(Main.utilisateur.getName());
     File[] files = file.listFiles();
@@ -36,7 +51,7 @@ public class ControleurNavigation implements Initializable {
     listClient.getStylesheets().add("/application/dossiers.css");
 
     // Affichage fichiers/dossiers côté serveur
-    ArrayList<String> filesServeur = Main.utilisateur.commandeLS(null);
+    ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");
     for (String s : filesServeur) {
       listServeur.getItems().add(new Label(s));
     }
@@ -48,86 +63,114 @@ public class ControleurNavigation implements Initializable {
 
   @FXML
   public void entrerCommande() {
+    // Affichage de la commande de l'utilisateur
     String path = Main.utilisateur.getPathClient();
     path = path.substring(0, path.length() - 1);
-    Label label = new Label(path + "# " + inputCommande.getText());
-    label.setTextFill(Color.web("#FFFFFF"));
-    listTerminal.getItems().add(label);
+    String name = Main.utilisateur.getName();
+    Label labelCommande = new Label(name + " : " + path + "# " + inputCommande.getText());
+    labelCommande.setTextFill(Color.web("#FFFFFF"));
+    listTerminal.getItems().add(labelCommande);
     scrollPaneTerminal.setVvalue(1);
+
+    // Préparation des vérifications de la commande
     String[] tabCommande = inputCommande.getText().split("\\s+");
-
-    // Commande CD
-    if (tabCommande[0].equals("cd")) {
-      // Récupération du dossier dans lequel il faut se déplacer
-      String dossier = "";
-      for (int i = 1; i < tabCommande.length; i++) {
-        dossier += tabCommande[i] + " ";
-      }
-
-      String oldClientPath = Main.utilisateur.getPathClient();
-      String cd = Main.utilisateur.commandeCD(dossier);
-      Label labelCD = new Label("   " + cd);
-      labelCD.setTextFill(Color.web("#FFFFFF"));
-      listTerminal.getItems().add(labelCD);
-
-      // Afficher le nouveau contenu du dossier courant
-      if (!Main.utilisateur.getPathClient().equals(oldClientPath)) {
-        ArrayList<String> filesServeur = Main.utilisateur.commandeLS(".");
-        listServeur.getItems().clear();
-        for (String s : filesServeur) {
-          listServeur.getItems().add(new Label(s));
-        }
-      }
+    String cmd = tabCommande[0];
+    String param = "";
+    for (int i = 1; i < tabCommande.length; i++) {
+      param += tabCommande[i] + " ";
     }
+    Pattern pattern = Pattern.compile("(.*[:*?\"<>|].*)");
+    Matcher matcher = pattern.matcher(param);
 
-    // Commande GET
-    else if (tabCommande[0].equals("get")) {
-      System.out.println("get");
-    }
-
-    // Commande LS
-    else if (tabCommande[0].equals("ls")) {
-      // Récupération du potentiel dossier dont il faut afficher le contenu
-      String dossier = "";
-      for (int i = 1; i < tabCommande.length; i++) {
-        dossier += tabCommande[i] + " ";
-      }
-
-      // Execution de la commande
-      ArrayList<String> files = Main.utilisateur.commandeLS(dossier);
-
-      // Afichage dans le terminal
-      if (files.get(0).equals("*")) {
-        Label labelLS = new Label("   " + files.get(1));
-        labelLS.setTextFill(Color.web("#FFFFFF"));
-        listTerminal.getItems().add(labelLS);
+    // Vérification de l'existence de la commande
+    if (!this.commandes.contains(cmd)) {
+      Label label = new Label("   " + cmd + " : commande inexistante");
+      label.setTextFill(Color.web("#FFFFFF"));
+      listTerminal.getItems().add(label);
+    } else if (matcher.find()) {
+      Label label = new Label("   " + param + " : paramètre invalide");
+      label.setTextFill(Color.web("#FFFFFF"));
+      listTerminal.getItems().add(label);
+    } else {
+      // Exécution de la commande
+      if (cmd.equals("clear")) {
+        listTerminal.getItems().clear();
       } else {
-        for (String s : files) {
-          Label labelLS = new Label("   " + s);
-          labelLS.setTextFill(Color.web("#FFFFFF"));
-          listTerminal.getItems().add(labelLS);
+        ArrayList<String> reponses = new ArrayList<String>();
+        if (cmd.equals("user")) {
+          ArrayList<String> connexion = Main.utilisateur.connexion(Main.utilisateur.getHost());
+          if (connexion.get(connexion.size() - 1).charAt(0) == 2) {
+            reponses.add("2 Connexion au serveur impossible");
+          } else {
+            reponses = Main.utilisateur.commande(cmd, param);
+          }
+        } else {
+          reponses = Main.utilisateur.commande(cmd, param);
+        }
+
+        // Affichage des réponses
+        for (String s : reponses) {
+          Label label = new Label("   " + s.substring(2));
+          label.setTextFill(Color.web("#FFFFFF"));
+          listTerminal.getItems().add(label);
+        }
+
+        // Potentielle adaptation de l'affichage des fichiers/dossiers
+        if (reponses.get(reponses.size() - 1).charAt(0) == '0') {
+          if (cmd.equals("cd") || cmd.equals("stor")) {
+            // Mise à jour de l'affichage de l'espace serveur
+            ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");
+            listServeur.getItems().clear();
+            for (String s : filesServeur) {
+              listServeur.getItems().add(new Label(s));
+            }
+          } else if (cmd.equals("get")) {
+            // Mise à jour de l'affichage de l'espace client
+            File file = new File(Main.utilisateur.getName());
+            File[] files = file.listFiles();
+            for (File f : files) {
+              listClient.getItems().add(new Label(f.isFile() ? f.getName() : f.getName() + "/"));
+            }
+          } else if (cmd.equals("user")) {
+            // Impossibilité de refaire user, possibilité de faire bye
+            commandes.remove("user");
+            commandes.add("bye");
+            commandes.add("pass");
+          } else if (cmd.equals("pass")) {
+            // Impossibilité de refaire, possibilité des autres commandes
+            commandes.remove("pass");
+            commandes.add("cd");
+            commandes.add("get");
+            commandes.add("ls");
+            commandes.add("pwd");
+            commandes.add("stor");
+            commandes.add("clear");
+
+            // Affichage de l'espace client/serveur du nouvel utilisateur
+            ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");
+            listServeur.getItems().clear();
+            for (String s : filesServeur) {
+              listServeur.getItems().add(new Label(s));
+            }
+            File file = new File(Main.utilisateur.getName());
+            File[] files = file.listFiles();
+            for (File f : files) {
+              listClient.getItems().add(new Label(f.isFile() ? f.getName() : f.getName() + "/"));
+            }
+          } else if (cmd.equals("bye")) {
+            // Possibilité de se connecter
+            commandes.clear();
+            commandes.add("user");
+
+            // Suppression de l'affichage de l'ancien utilisateur
+            listClient.getItems().clear();
+            listServeur.getItems().clear();
+          }
         }
       }
     }
 
-    // Commande PWD
-    else if (tabCommande[0].equals("pwd")) {
-      String pwd = Main.utilisateur.commandePWD();
-      Label labelPWD = new Label("   " + pwd);
-      labelPWD.setTextFill(Color.web("#FFFFFF"));
-      listTerminal.getItems().add(labelPWD);
-    }
-
-    // Commande STOR
-    else if (tabCommande[0].equals("stor")) {
-      System.out.println("stor");
-    }
-
-    // Commandes inexistante
-    else {
-      System.out.println("autre");
-    }
-
+    // Suppression de la commande écrite par l'utilisateur
     inputCommande.setText("");
   }
 }

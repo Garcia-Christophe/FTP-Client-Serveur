@@ -59,7 +59,7 @@ public class CommandeGET extends Commande {
       } else if (!file.isFile()) {
         ps.println("2 Le chemin " + destination + " n'est pas celui d'un fichier.");
       } else {
-        ps.println("1 Téléchargement du fichier en cours");
+        ps.println("1 Téléchargement du fichier en cours...");
 
         ServerSocket serveurFTP;
         try {
