@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -108,6 +109,7 @@ public class ControleurNavigation implements Initializable {
 
     // Init terminal
     listTerminal.getStylesheets().add("/application/terminal.css");
+    Platform.runLater(() -> inputCommande.requestFocus());
   }
 
   @FXML

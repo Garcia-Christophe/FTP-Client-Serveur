@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 
@@ -19,6 +20,7 @@ public class Main extends Application {
       Parent root = FXMLLoader.load(getClass().getResource("connexion.fxml"));
       stage = primaryStage;
       stage.setTitle("MyFTP");
+      stage.getIcons().add(new Image("file:Images/logo.png"));
       Scene s = new Scene(root);
       s.getStylesheets().add("/application/erreur.css");
       stage.setScene(s);

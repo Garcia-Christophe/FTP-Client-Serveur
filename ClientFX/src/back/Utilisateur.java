@@ -11,14 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ConnectException;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Utilisateur {
 
@@ -216,77 +212,10 @@ public class Utilisateur {
         }
       }
     } catch (IOException e) {
-      reponses.add("2 Impossible d'exécuter la commande");
-      e.printStackTrace();
+      reponses.add("2 Le serveur est déconnecté");
     }
 
     return reponses;
-  }
-
-  public void communication() {
-    // Pattern pour le nom des fichiers et dossiers
-    Pattern pattern = Pattern.compile("(.*[:*?\"<>|].*)");
-    Matcher matcher = null;
-    Scanner scan = null;
-
-    String envoi = "";
-    String name = "";
-    scan = new Scanner(System.in);
-    boolean commandeValide = true;
-    String destination = pathClient;
-
-    // Boucle d'envoi des commandes
-    while (!envoi.equals("bye")) {
-      // Réponse du serveur
-      String recu = "";
-      boolean arreter = false;
-      while (!arreter && commandeValide) {
-        recu = br.readLine();
-        System.out.println(recu);
-
-        String[] val = recu.split("\\s+");
-        if (!val[0].equals("1")) {
-          arreter = true;
-        }
-
-        // Si le client doit télécharger un fichier (GET)
-        String[] e = envoi.split("\\s+");
-      }
-
-      // Récupération de la commande
-      System.out.println("\nEntrez votre commande :");
-      envoi = scan.nextLine();
-
-      String[] tab = envoi.split("\\s+");
-      boolean existe = false;
-      int i = 0;
-
-      if (tab.length > 1) {
-        matcher = pattern.matcher(tab[1]);
-        if (matcher.find()) {
-          existe = false;
-        }
-      }
-
-      // vérification du fichier en cas de commande stor
-      if (tab[0].equals("stor") && tab.length > 1) {
-
-      } else if (tab[0].equals("user") && tab.length > 1) {
-        name = tab[1];
-      }
-
-      if (existe) {
-        pw.println(envoi);
-        pw.flush();
-        commandeValide = true;
-      } else {
-        commandeValide = false;
-        System.out.println("Commande " + tab[0] + " inexistante ou paramètre invalide");
-      }
-    }
-
-    // Déconnexion du client
-    this.deconnexion();
   }
 
   /**
