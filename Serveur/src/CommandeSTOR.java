@@ -44,6 +44,7 @@ public class CommandeSTOR extends Commande {
         socket.close();
         serveurFTP.close();
       } catch (IOException e) {
+        ps.println("2 Erreur lors du téléchargement du fichier");
         e.printStackTrace();
       }
     } else {

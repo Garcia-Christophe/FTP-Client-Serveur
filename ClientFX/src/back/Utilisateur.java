@@ -80,16 +80,121 @@ public class Utilisateur {
     ArrayList<String> reponses = new ArrayList<String>();
 
     try {
-
+      // Envoi de la commande
+      String reponse = "1 ";
       if (cmd.equals("bye")) {
         pw.println(cmd);
         pw.flush();
 
         this.deconnexion();
         reponses.add("0 Vous avez été déconnecté");
+      } else if (cmd.equals("get")) {
+        pw.println(cmd + " " + param);
+        pw.flush();
+
+        while (reponse.split("\\s+")[0].equals("1")) {
+          reponse = br.readLine();
+          reponses.add(reponse);
+
+          // Téléchargement du fichier via une autre socket
+          if (reponse.split("\\s+")[0].equals("1")) {
+            Socket socketGet = new Socket(host, 5000);
+            InputStream inputGet = socketGet.getInputStream();
+            ByteArrayOutputStream byteArrayGet = new ByteArrayOutputStream();
+
+            if (inputGet != null) {
+              String[] s = param.split("/");
+              FileOutputStream fos = new FileOutputStream(name + "/" + s[s.length - 1]);
+              BufferedOutputStream bos = new BufferedOutputStream(fos);
+              byte[] aByte = new byte[1];
+
+              while (inputGet.read(aByte, 0, aByte.length) != -1) {
+                byteArrayGet.write(aByte);
+              }
+              bos.write(byteArrayGet.toByteArray());
+              bos.flush();
+              bos.close();
+              socketGet.close();
+            }
+          }
+        }
+      } else if (cmd.equals("stor")) {
+        boolean paramOK = true;
+
+        // Conversion des chemins relatifs
+        String base = param;
+        String destination = "";
+        if (base.charAt(0) != '/') {
+          base = "/" + base;
+        }
+        destination = name + "/";
+        if (base.equals("/")) {
+          destination = name + "/";
+        } else {
+          String[] dossiers = base.split("/");
+          for (String s : dossiers) {
+            if (s.length() != 0) {
+              if (s.equals("..")) {
+                if (!destination.equals(name + "/")) {
+                  String[] tabPathTmp = destination.split("/");
+                  destination = "";
+                  for (int j = 0; j < tabPathTmp.length - 1; j++) {
+                    destination += tabPathTmp[j] + "/";
+                  }
+                }
+              } else if (s.equals("~")) {
+                destination = name + "/";
+              } else if (!s.equals(".")) {
+                destination = destination + s + "/";
+              }
+            }
+          }
+        }
+
+        // Création de l'objet File
+        destination = destination.substring(0, destination.length() - 1);
+        File file = new File(destination);
+
+        // Si le fichier existe
+        if (file != null && (!Files.exists(Paths.get(destination)) || !file.isFile())) {
+          paramOK = false;
+        }
+
+        if (paramOK) {
+          pw.println(cmd + " " + destination);
+          pw.flush();
+
+          while (reponse.split("\\s+")[0].equals("1")) {
+            reponse = br.readLine();
+            reponses.add(reponse);
+
+            // Chargement du fichier
+            if (reponse.split("\\s+")[0].equals("1")) {
+              try {
+                Socket socketStor = new Socket(host, 4000);
+                File fileStor = new File(destination);
+                BufferedOutputStream bos = new BufferedOutputStream(socketStor.getOutputStream());
+                if (bos != null) {
+                  byte[] tabByte = new byte[(int) fileStor.length()];
+                  FileInputStream fis = new FileInputStream(fileStor);
+                  BufferedInputStream bis = new BufferedInputStream(fis);
+                  bis.read(tabByte, 0, tabByte.length);
+                  bos.write(tabByte, 0, tabByte.length);
+                  bos.flush();
+                  bis.close();
+                  fis.close();
+                  bos.close();
+                  socketStor.close();
+                }
+              } catch (IOException er) {
+                er.printStackTrace();
+              }
+            }
+          }
+        } else {
+          reponses.add("2 " + destination + " : paramètre invalide");
+        }
       } else {
-        // Envoi de la commande
-        String reponse = "1 ";
         pw.println(cmd + (param != null ? " " + param : ""));
         pw.flush();
 
@@ -146,48 +251,6 @@ public class Utilisateur {
 
         // Si le client doit télécharger un fichier (GET)
         String[] e = envoi.split("\\s+");
-        if (e[0].equals("get") && !arreter) {
-          Socket socketGet = new Socket(host, 5000);
-          InputStream inputGet = socketGet.getInputStream();
-          ByteArrayOutputStream byteArrayGet = new ByteArrayOutputStream();
-
-          if (inputGet != null) {
-            String[] s = e[1].split("/");
-            FileOutputStream fos = new FileOutputStream(pathClient + s[s.length - 1]);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-            byte[] aByte = new byte[1];
-
-            while (inputGet.read(aByte, 0, aByte.length) != -1) {
-              byteArrayGet.write(aByte);
-            }
-            bos.write(byteArrayGet.toByteArray());
-            bos.flush();
-            bos.close();
-            socketGet.close();
-          }
-          // Si le client doit déposer un fichier (STOR)
-        } else if (e[0].equals("stor") && !arreter) {
-          try {
-            Socket socketStor = new Socket(host, 4000);
-            File file = new File(destination);
-            BufferedOutputStream bos = new BufferedOutputStream(socketStor.getOutputStream());
-            if (bos != null) {
-              byte[] tabByte = new byte[(int) file.length()];
-              FileInputStream fis = new FileInputStream(file);
-              BufferedInputStream bis = new BufferedInputStream(fis);
-              bis.read(tabByte, 0, tabByte.length);
-              bos.write(tabByte, 0, tabByte.length);
-              bos.flush();
-              bis.close();
-              fis.close();
-              bos.close();
-              socketStor.close();
-            }
-
-          } catch (IOException er) {
-            er.printStackTrace();
-          }
-        }
       }
 
       // Récupération de la commande
@@ -207,43 +270,7 @@ public class Utilisateur {
 
       // vérification du fichier en cas de commande stor
       if (tab[0].equals("stor") && tab.length > 1) {
-        String base = tab[1];
-        if (base.charAt(0) != '/') {
-          base = "/" + base;
-        }
 
-        // Conversion des chemins relatifs
-        destination = pathClient;
-        if (base.equals("/")) {
-          destination = pathClient;
-        } else {
-          String[] dossiers = base.split("/");
-          for (String s : dossiers) {
-            if (s.length() != 0) {
-              if (s.equals("..")) {
-                if (!destination.equals(pathClient)) {
-                  String[] tabPathTmp = destination.split("/");
-                  destination = "";
-                  for (int j = 0; j < tabPathTmp.length - 1; j++) {
-                    destination += tabPathTmp[j] + "/";
-                  }
-                }
-              } else if (s.equals("~")) {
-                destination = pathClient;
-              } else if (!s.equals(".")) {
-                destination = destination + s + "/";
-              }
-            }
-          }
-        }
-
-        // Création de l'objet File
-        File file = new File(destination);
-
-        // Si le fichier existe
-        if (!Files.exists(Paths.get(destination)) || !file.isFile()) {
-          existe = false;
-        }
       } else if (tab[0].equals("user") && tab.length > 1) {
         name = tab[1];
       }

@@ -23,6 +23,14 @@ public class CommandExecutor {
       // Envoyer (uploader) un fichier
       if (commande.split(" ")[0].equals("stor"))
         (new CommandeSTOR(ps, commande, main)).execute();
+
+      // Créer un fichier
+      if (commande.split(" ")[0].equals("touch"))
+        (new CommandeTOUCH(ps, commande, main)).execute();
+
+      // Créer un répertoire
+      if (commande.split(" ")[0].equals("mkdir"))
+        (new CommandeMKDIR(ps, commande, main)).execute();
     } else {
       if (commande.split(" ")[0].equals("pass") || commande.split(" ")[0].equals("user")) {
         // Le mot de passe pour l'authentification

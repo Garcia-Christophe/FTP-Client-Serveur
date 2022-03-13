@@ -41,6 +41,8 @@ public class ControleurNavigation implements Initializable {
     commandes.add("pwd");
     commandes.add("stor");
     commandes.add("clear");
+    commandes.add("touch");
+    commandes.add("mkdir");
 
     // Affichage fichiers/dossiers côté client
     File file = new File(Main.utilisateur.getName());
@@ -53,7 +55,7 @@ public class ControleurNavigation implements Initializable {
     // Affichage fichiers/dossiers côté serveur
     ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");
     for (String s : filesServeur) {
-      listServeur.getItems().add(new Label(s));
+      listServeur.getItems().add(new Label(s.substring(2)));
     }
     listServeur.getStylesheets().add("/application/dossiers.css");
 
@@ -79,6 +81,7 @@ public class ControleurNavigation implements Initializable {
     for (int i = 1; i < tabCommande.length; i++) {
       param += tabCommande[i] + " ";
     }
+    param = param.length() > 0 ? param.substring(0, param.length() - 1) : param;
     Pattern pattern = Pattern.compile("(.*[:*?\"<>|].*)");
     Matcher matcher = pattern.matcher(param);
 
@@ -117,17 +120,19 @@ public class ControleurNavigation implements Initializable {
 
         // Potentielle adaptation de l'affichage des fichiers/dossiers
         if (reponses.get(reponses.size() - 1).charAt(0) == '0') {
-          if (cmd.equals("cd") || cmd.equals("stor")) {
+          if (cmd.equals("cd") || cmd.equals("stor") || cmd.equals("touch")
+              || cmd.equals("mkdir")) {
             // Mise à jour de l'affichage de l'espace serveur
             ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");
             listServeur.getItems().clear();
             for (String s : filesServeur) {
-              listServeur.getItems().add(new Label(s));
+              listServeur.getItems().add(new Label(s.substring(2)));
             }
           } else if (cmd.equals("get")) {
             // Mise à jour de l'affichage de l'espace client
             File file = new File(Main.utilisateur.getName());
             File[] files = file.listFiles();
+            listClient.getItems().clear();
             for (File f : files) {
               listClient.getItems().add(new Label(f.isFile() ? f.getName() : f.getName() + "/"));
             }
@@ -145,12 +150,14 @@ public class ControleurNavigation implements Initializable {
             commandes.add("pwd");
             commandes.add("stor");
             commandes.add("clear");
+            commandes.add("touch");
+            commandes.add("mkdir");
 
             // Affichage de l'espace client/serveur du nouvel utilisateur
             ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");
             listServeur.getItems().clear();
             for (String s : filesServeur) {
-              listServeur.getItems().add(new Label(s));
+              listServeur.getItems().add(new Label(s.substring(2)));
             }
             File file = new File(Main.utilisateur.getName());
             File[] files = file.listFiles();
@@ -165,6 +172,7 @@ public class ControleurNavigation implements Initializable {
             // Suppression de l'affichage de l'ancien utilisateur
             listClient.getItems().clear();
             listServeur.getItems().clear();
+            listTerminal.getItems().clear();
           }
         }
       }
