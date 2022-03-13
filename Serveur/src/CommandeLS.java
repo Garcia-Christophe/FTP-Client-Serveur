@@ -52,7 +52,7 @@ public class CommandeLS extends Commande {
 
       // Affichage des fichiers et dossiers
       if (files.length == 0) {
-        ps.println("0 Dossier vide");
+        ps.println("0 *Dossier vide*");
       } else {
         for (int i = 0; i < files.length; i++) {
           if (i != files.length - 1) {

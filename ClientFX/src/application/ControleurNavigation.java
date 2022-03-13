@@ -12,7 +12,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 
 public class ControleurNavigation implements Initializable {
@@ -28,7 +32,7 @@ public class ControleurNavigation implements Initializable {
   @FXML
   private ListView<Label> listServeur;
   @FXML
-  private ListView<Label> listTerminal;
+  private ListView<TextFlow> listTerminal;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -48,14 +52,57 @@ public class ControleurNavigation implements Initializable {
     File file = new File(Main.utilisateur.getName());
     File[] files = file.listFiles();
     for (File f : files) {
-      listClient.getItems().add(new Label(f.isFile() ? f.getName() : f.getName() + "/"));
+      // Image Source Fichier
+      Image imageF = null;
+      imageF = new Image("file:Images/fichier.png");
+      ImageView imageViewF = new ImageView(imageF);
+      imageViewF.setFitHeight(20);
+      imageViewF.setFitWidth(20);
+      // Image Source Dossier
+      Image imageD = null;
+      imageD = new Image("file:Images/dossier.png");
+      ImageView imageViewD = new ImageView(imageD);
+      imageViewD.setFitHeight(20);
+      imageViewD.setFitWidth(20);
+
+      Label label = new Label();
+      if (f.isFile()) {
+        label = new Label(f.isFile() ? f.getName() : f.getName() + "/", imageViewF);
+        label.setGraphic(imageViewF);
+      } else {
+        label = new Label(f.isFile() ? f.getName() : f.getName() + "/", imageViewD);
+        label.setGraphic(imageViewD);
+      }
+
+      listClient.getItems().add(label);
     }
     listClient.getStylesheets().add("/application/dossiers.css");
 
     // Affichage fichiers/dossiers côté serveur
     ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");
     for (String s : filesServeur) {
-      listServeur.getItems().add(new Label(s.substring(2)));
+      // Image Source Fichier
+      Image imageF = null;
+      imageF = new Image("file:Images/fichier.png");
+      ImageView imageViewF = new ImageView(imageF);
+      imageViewF.setFitHeight(20);
+      imageViewF.setFitWidth(20);
+      // Image Source Dossier
+      Image imageD = null;
+      imageD = new Image("file:Images/dossier.png");
+      ImageView imageViewD = new ImageView(imageD);
+      imageViewD.setFitHeight(20);
+      imageViewD.setFitWidth(20);
+
+      Label label = new Label();
+      if (s.charAt(s.length() - 1) == '/') {
+        label = new Label(s.substring(2), imageViewD);
+        label.setGraphic(imageViewD);
+      } else if (s.charAt(s.length() - 1) != '*') {
+        label = new Label(s.substring(2), imageViewF);
+        label.setGraphic(imageViewF);
+      }
+      listServeur.getItems().add(label);
     }
     listServeur.getStylesheets().add("/application/dossiers.css");
 
@@ -69,9 +116,20 @@ public class ControleurNavigation implements Initializable {
     String path = Main.utilisateur.getPathClient();
     path = path.substring(0, path.length() - 1);
     String name = Main.utilisateur.getName();
-    Label labelCommande = new Label(name + " : " + path + "# " + inputCommande.getText());
-    labelCommande.setTextFill(Color.web("#FFFFFF"));
-    listTerminal.getItems().add(labelCommande);
+    Text commande = new Text(inputCommande.getText());
+    commande.setFill(Color.web("#FFFFFF"));
+    Text deuxpoints = new Text(" : ");
+    deuxpoints.setFill(Color.web("#FFFFFF"));
+    Text nameText = new Text(name);
+    nameText.setFill(Color.web("#ffd389"));
+    Text pathText = new Text(path);
+    pathText.setFill(Color.web("#dcf6f8"));
+    Text hashtag = new Text("# ");
+    hashtag.setFill(Color.web("#FFFFFF"));
+
+    TextFlow commandeFlowPane = new TextFlow();
+    commandeFlowPane.getChildren().addAll(nameText, deuxpoints, pathText, hashtag, commande);
+    listTerminal.getItems().add(commandeFlowPane);
     scrollPaneTerminal.setVvalue(1);
 
     // Préparation des vérifications de la commande
@@ -89,11 +147,15 @@ public class ControleurNavigation implements Initializable {
     if (!this.commandes.contains(cmd)) {
       Label label = new Label("   " + cmd + " : commande inexistante");
       label.setTextFill(Color.web("#FFFFFF"));
-      listTerminal.getItems().add(label);
+      TextFlow txt = new TextFlow();
+      txt.getChildren().add(label);
+      listTerminal.getItems().add(txt);
     } else if (matcher.find()) {
       Label label = new Label("   " + param + " : paramètre invalide");
       label.setTextFill(Color.web("#FFFFFF"));
-      listTerminal.getItems().add(label);
+      TextFlow txt = new TextFlow();
+      txt.getChildren().add(label);
+      listTerminal.getItems().add(txt);
     } else {
       // Exécution de la commande
       if (cmd.equals("clear")) {
@@ -115,7 +177,9 @@ public class ControleurNavigation implements Initializable {
         for (String s : reponses) {
           Label label = new Label("   " + s.substring(2));
           label.setTextFill(Color.web("#FFFFFF"));
-          listTerminal.getItems().add(label);
+          TextFlow txt = new TextFlow();
+          txt.getChildren().add(label);
+          listTerminal.getItems().add(txt);
         }
 
         // Potentielle adaptation de l'affichage des fichiers/dossiers
@@ -126,7 +190,28 @@ public class ControleurNavigation implements Initializable {
             ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");
             listServeur.getItems().clear();
             for (String s : filesServeur) {
-              listServeur.getItems().add(new Label(s.substring(2)));
+              // Image Source Fichier
+              Image imageF = null;
+              imageF = new Image("file:Images/fichier.png");
+              ImageView imageViewF = new ImageView(imageF);
+              imageViewF.setFitHeight(20);
+              imageViewF.setFitWidth(20);
+              // Image Source Dossier
+              Image imageD = null;
+              imageD = new Image("file:Images/dossier.png");
+              ImageView imageViewD = new ImageView(imageD);
+              imageViewD.setFitHeight(20);
+              imageViewD.setFitWidth(20);
+
+              Label label = new Label();
+              if (s.charAt(s.length() - 1) == '/') {
+                label = new Label(s.substring(2), imageViewD);
+                label.setGraphic(imageViewD);
+              } else if (s.charAt(s.length() - 1) != '*') {
+                label = new Label(s.substring(2), imageViewF);
+                label.setGraphic(imageViewF);
+              }
+              listServeur.getItems().add(label);
             }
           } else if (cmd.equals("get")) {
             // Mise à jour de l'affichage de l'espace client
@@ -134,7 +219,29 @@ public class ControleurNavigation implements Initializable {
             File[] files = file.listFiles();
             listClient.getItems().clear();
             for (File f : files) {
-              listClient.getItems().add(new Label(f.isFile() ? f.getName() : f.getName() + "/"));
+              // Image Source Fichier
+              Image imageF = null;
+              imageF = new Image("file:Images/fichier.png");
+              ImageView imageViewF = new ImageView(imageF);
+              imageViewF.setFitHeight(20);
+              imageViewF.setFitWidth(20);
+              // Image Source Dossier
+              Image imageD = null;
+              imageD = new Image("file:Images/dossier.png");
+              ImageView imageViewD = new ImageView(imageD);
+              imageViewD.setFitHeight(20);
+              imageViewD.setFitWidth(20);
+
+              Label label = new Label();
+              if (f.isFile()) {
+                label = new Label(f.isFile() ? f.getName() : f.getName() + "/", imageViewF);
+                label.setGraphic(imageViewF);
+              } else {
+                label = new Label(f.isFile() ? f.getName() : f.getName() + "/", imageViewD);
+                label.setGraphic(imageViewD);
+              }
+
+              listClient.getItems().add(label);
             }
           } else if (cmd.equals("user")) {
             // Impossibilité de refaire user, possibilité de faire bye
@@ -157,12 +264,55 @@ public class ControleurNavigation implements Initializable {
             ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");
             listServeur.getItems().clear();
             for (String s : filesServeur) {
-              listServeur.getItems().add(new Label(s.substring(2)));
+              // Image Source Fichier
+              Image imageF = null;
+              imageF = new Image("file:Images/fichier.png");
+              ImageView imageViewF = new ImageView(imageF);
+              imageViewF.setFitHeight(20);
+              imageViewF.setFitWidth(20);
+              // Image Source Dossier
+              Image imageD = null;
+              imageD = new Image("file:Images/dossier.png");
+              ImageView imageViewD = new ImageView(imageD);
+              imageViewD.setFitHeight(20);
+              imageViewD.setFitWidth(20);
+
+              Label label = new Label();
+              if (s.charAt(s.length() - 1) == '/') {
+                label = new Label(s.substring(2), imageViewD);
+                label.setGraphic(imageViewD);
+              } else if (s.charAt(s.length() - 1) != '*') {
+                label = new Label(s.substring(2), imageViewF);
+                label.setGraphic(imageViewF);
+              }
+              listServeur.getItems().add(label);
             }
             File file = new File(Main.utilisateur.getName());
             File[] files = file.listFiles();
             for (File f : files) {
-              listClient.getItems().add(new Label(f.isFile() ? f.getName() : f.getName() + "/"));
+              // Image Source Fichier
+              Image imageF = null;
+              imageF = new Image("file:Images/fichier.png");
+              ImageView imageViewF = new ImageView(imageF);
+              imageViewF.setFitHeight(20);
+              imageViewF.setFitWidth(20);
+              // Image Source Dossier
+              Image imageD = null;
+              imageD = new Image("file:Images/dossier.png");
+              ImageView imageViewD = new ImageView(imageD);
+              imageViewD.setFitHeight(20);
+              imageViewD.setFitWidth(20);
+
+              Label labelI = new Label();
+              if (f.isFile()) {
+                labelI = new Label(f.isFile() ? f.getName() : f.getName() + "/", imageViewF);
+                labelI.setGraphic(imageViewF);
+              } else {
+                labelI = new Label(f.isFile() ? f.getName() : f.getName() + "/", imageViewD);
+                labelI.setGraphic(imageViewD);
+              }
+
+              listClient.getItems().add(labelI);
             }
           } else if (cmd.equals("bye")) {
             // Possibilité de se connecter
