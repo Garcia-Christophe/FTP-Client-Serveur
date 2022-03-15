@@ -33,7 +33,7 @@
                            <content>
                               <AnchorPane>
                                  <children>
-                                    <ListView fx:id="listClient" style="-fx-background-color: #dcf8f6;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <ListView fx:id="listClient" focusTraversable="false" style="-fx-background-color: #dcf8f6;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children></AnchorPane>
                            </content>
                         </ScrollPane>
@@ -60,7 +60,7 @@
                           <content>
                             <AnchorPane>
                                  <children>
-                                    <ListView fx:id="listServeur" style="-fx-background-color: #dcf8f6;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <ListView fx:id="listServeur" focusTraversable="false" style="-fx-background-color: #dcf8f6;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children></AnchorPane>
                           </content>
                         </ScrollPane>
