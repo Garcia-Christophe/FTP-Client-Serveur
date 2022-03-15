@@ -48,7 +48,8 @@ public class ControleurNavigation implements Initializable {
     commandes.add("clear");
     commandes.add("touch");
     commandes.add("mkdir");
-
+    commandes.add("rm");
+    commandes.add("rmdir");
 
     // Affichage fichiers/dossiers côté client
     File file = new File(Main.utilisateur.getName());
@@ -187,8 +188,8 @@ public class ControleurNavigation implements Initializable {
 
         // Potentielle adaptation de l'affichage des fichiers/dossiers
         if (reponses.get(reponses.size() - 1).charAt(0) == '0') {
-          if (cmd.equals("cd") || cmd.equals("stor") || cmd.equals("touch")
-              || cmd.equals("mkdir")) {
+          if (cmd.equals("cd") || cmd.equals("stor") || cmd.equals("touch") || cmd.equals("mkdir")
+              || cmd.equals("rm") || cmd.equals("rmdir")) {
             // Mise à jour de l'affichage de l'espace serveur
             ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");
             listServeur.getItems().clear();
@@ -262,6 +263,8 @@ public class ControleurNavigation implements Initializable {
             commandes.add("clear");
             commandes.add("touch");
             commandes.add("mkdir");
+            commandes.add("rm");
+            commandes.add("rmdir");
 
             // Affichage de l'espace client/serveur du nouvel utilisateur
             ArrayList<String> filesServeur = Main.utilisateur.commande("ls", "");

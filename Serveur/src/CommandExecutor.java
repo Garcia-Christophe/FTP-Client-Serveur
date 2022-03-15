@@ -28,9 +28,18 @@ public class CommandExecutor {
       if (commande.split(" ")[0].equals("touch"))
         (new CommandeTOUCH(ps, commande, main)).execute();
 
+      // Supprimer un fichier
+      if (commande.split(" ")[0].equals("rm"))
+        (new CommandeRM(ps, commande, main)).execute();
+
       // Créer un répertoire
       if (commande.split(" ")[0].equals("mkdir"))
         (new CommandeMKDIR(ps, commande, main)).execute();
+
+      // Supprimer un dossier
+      if (commande.split(" ")[0].equals("rmdir"))
+        (new CommandeRMDIR(ps, commande, main)).execute();
+
     } else {
       if (commande.split(" ")[0].equals("pass") || commande.split(" ")[0].equals("user")) {
         // Le mot de passe pour l'authentification

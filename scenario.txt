@@ -33,6 +33,9 @@ COMMANDES
 - mkdir a b (dossier avec espace)
 - touch a b/a.txt
 - ls a b
+- rmdir a b (impossible dossier non vide)
+- rm a b/a.txt
+- rmdir a b
 
 - bye
 - ls (impossible)
@@ -46,6 +49,6 @@ MULTI CLIENTS
 GESTION DEPARTS
 - fermer fenêtre rio
 - montrer serveur toujours en route (+ message)
-- cd a b (personne : ça tourne toujours)
+- ls (personne : ça tourne toujours)
 - fermer le serveur
 - ls : serveur déconnecté
