@@ -30,9 +30,9 @@ COMMANDES
 
 (nouvelles commandes)
 - clear
-- mkdir a
-- touch a/a.txt
-- ls a
+- mkdir a b (dossier avec espace)
+- touch a b/a.txt
+- ls a b
 
 - bye
 - ls (impossible)
@@ -46,6 +46,6 @@ MULTI CLIENTS
 GESTION DEPARTS
 - fermer fenêtre rio
 - montrer serveur toujours en route (+ message)
-- cd a (personne : ça tourne toujours)
+- cd a b (personne : ça tourne toujours)
 - fermer le serveur
 - ls : serveur déconnecté
