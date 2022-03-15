@@ -1,0 +1,51 @@
+Scénario :
+
+SE CONNECTER
+- host : localhost, user : personne, mdp : (vide) -> champs manquant
+- mdp : a -> mdp faux
+- mdp : personne29
+
+PRÉSENTATION
+- 1 : affichage des fichiers/dossiers côté client (espace personnel)
+- 2 : affichage des fichiers/dossiers côté serveur (espace personnel)
+- 3 : terminal pour entrer les commandes
+
+COMMANDES 
+- ls simple : ls 
+- ls avec paramètre : ls dossier1
+- ls avec chemin relatif : ls .. (montre dossier courant) 
+
+- cd simple : cd dossier1 - (pwd)
+- cd chemin relatif : cd ../../.. (/ et ~ gérés) - (pwd)
+- cd dossier1/dossier2 (ls)
+
+- stor essai.txt
+- cd ~ (pour faire le get ensuite)
+- get dossier1/test.txt
+
+(erreurs commandes)
+- ls szrt (dossier inexistant)
+- stor ../build.fxbuild (hors espace personnel)
+- cey : commande inexistante
+
+(nouvelles commandes)
+- clear
+- mkdir a
+- touch a/a.txt
+- ls a
+
+- bye
+- ls (impossible)
+- user rio
+- pass rio29
+
+MULTI CLIENTS
+- connection à personne
+- get pw.txt (bien indépendant)
+
+GESTION DEPARTS
+- fermer fenêtre rio
+- montrer serveur toujours en route (+ message)
+- cd a (personne : ça tourne toujours)
+- fermer le serveur
+- ls : serveur déconnecté
