@@ -30,12 +30,21 @@ public class CommandePASS extends Commande {
     }
 
     // Vérification du mot de passe
-    if (commandeArgs != null && commandeArgs.length > 0 && commandeArgs[0].equals(mdp)) {
-      main.pwOk = true;
-      ps.println("1 Commande pass OK");
-      ps.println("0 Vous etes bien connecte sur notre serveur");
+    if (commandeArgs != null && commandeArgs.length > 0) {
+      String paramMdp = "";
+      for (int i = 0; i < commandeArgs.length; i++) {
+        paramMdp += commandeArgs[i];
+      }
+
+      if (paramMdp.equals(mdp)) {
+        main.pwOk = true;
+        ps.println("1 Commande pass OK");
+        ps.println("0 Vous etes bien connecte sur notre serveur");
+      } else {
+        ps.println("2 Le mot de passe est faux");
+      }
     } else {
-      ps.println("2 Le mode de passe est faux");
+      ps.println("2 Le mot de passe est vide");
     }
   }
 

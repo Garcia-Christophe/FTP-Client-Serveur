@@ -15,7 +15,11 @@ public abstract class Commande {
     commandeArgs = new String[args.length - 1];
 
     for (int i = 0; i < commandeArgs.length; i++) {
-      commandeArgs[i] = args[i + 1];
+      commandeArgs[i] = args[i + 1] + " ";
+    }
+    if (commandeArgs.length > 0) {
+      commandeArgs[commandeArgs.length - 1] = commandeArgs[commandeArgs.length - 1].substring(0,
+          commandeArgs[commandeArgs.length - 1].length() - 1);
     }
 
     if (path == null) {

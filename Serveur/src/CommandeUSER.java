@@ -13,7 +13,11 @@ public class CommandeUSER extends Commande {
   public void execute() {
     if (commandeArgs != null && commandeArgs.length > 0) {
       // Ce serveur accepte uniquement le user personne
-      File file = new File(path + "/" + commandeArgs[0]);
+      String paramUser = "";
+      for (int i = 0; i < commandeArgs.length; i++) {
+        paramUser += commandeArgs[i];
+      }
+      File file = new File(path + "/" + paramUser);
 
       // Si l'utilisateur ne correspond pas à un dossier du projet Java
       if (!commandeArgs[0].equals("src") && !commandeArgs[0].equals("bin")

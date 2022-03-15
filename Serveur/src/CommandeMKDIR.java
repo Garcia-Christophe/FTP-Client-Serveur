@@ -1,8 +1,5 @@
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class CommandeMKDIR extends Commande {
 
@@ -15,7 +12,10 @@ public class CommandeMKDIR extends Commande {
 
   public void execute() {
     if (commandeArgs != null && commandeArgs.length > 0) {
-      String base = commandeArgs[0];
+      String base = "";
+      for (int i = 0; i < commandeArgs.length; i++) {
+        base += commandeArgs[i];
+      }
       if (base.charAt(0) != '/') {
         base = "/" + base;
       }

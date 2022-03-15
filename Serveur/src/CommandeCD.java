@@ -15,7 +15,11 @@ public class CommandeCD extends Commande {
 
   public void execute() {
     if (commandeArgs != null && commandeArgs.length > 0) {
-      String destination = commandeArgs[0];
+      String destination = "";
+      for (int i = 0; i < commandeArgs.length; i++) {
+        destination += commandeArgs[i];
+      }
+
       if (destination.charAt(0) != '/') {
         destination = "/" + destination;
       }

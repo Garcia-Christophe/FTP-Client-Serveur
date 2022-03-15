@@ -27,7 +27,11 @@ public class CommandeSTOR extends Commande {
         ByteArrayOutputStream byteArrayGet = new ByteArrayOutputStream();
 
         if (inputGet != null) {
-          String[] s = commandeArgs[0].split("/");
+          String base = "";
+          for (int i = 0; i < commandeArgs.length; i++) {
+            base += commandeArgs[i];
+          }
+          String[] s = base.split("/");
           FileOutputStream fos =
               new FileOutputStream(path + this.main.getUserPath() + s[s.length - 1]);
           BufferedOutputStream bos = new BufferedOutputStream(fos);
