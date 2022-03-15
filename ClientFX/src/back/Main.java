@@ -37,6 +37,8 @@ public class Main {
     commandes.add("ls");
     commandes.add("stor");
     commandes.add("bye");
+    commandes.add("touch");
+    commandes.add("mkdir");
 
     Pattern pattern = Pattern.compile("(.*[:*?\"<>|].*)");
     Matcher matcher = null;

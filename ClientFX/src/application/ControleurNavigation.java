@@ -49,6 +49,7 @@ public class ControleurNavigation implements Initializable {
     commandes.add("touch");
     commandes.add("mkdir");
 
+
     // Affichage fichiers/dossiers côté client
     File file = new File(Main.utilisateur.getName());
     File[] files = file.listFiles();
