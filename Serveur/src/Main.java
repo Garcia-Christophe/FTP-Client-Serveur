@@ -1,5 +1,5 @@
 /*
- * TP JAVA RIP Min Serveur FTP
+ * Main du Serveur
  */
 
 import java.io.BufferedReader;

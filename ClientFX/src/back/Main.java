@@ -1,3 +1,7 @@
+/*
+ * Main du Client (interface console)
+ */
+
 package back;
 
 import java.io.BufferedInputStream;

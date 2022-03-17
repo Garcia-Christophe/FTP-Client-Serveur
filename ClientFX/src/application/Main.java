@@ -1,3 +1,7 @@
+/*
+ * Main du Client (interface graphique)
+ */
+
 package application;
 
 import back.Utilisateur;
